@@ -19,14 +19,6 @@ class ReplyTopicTestCase(TestCase):
         self.url = reverse('reply_topic', kwargs={'board_pk': self.board.pk, 'topic_pk': self.topic.pk})
 
 
-class LoginRequiredReplyTopicTests(ReplyTopicTestCase):
-    pass
-
-
-class ReplyTopicTests(ReplyTopicTestCase):
-    pass
-
-
 class SuccessfulReplyTopicTests(ReplyTopicTestCase):
     def test_redirection(self):
         '''
@@ -34,9 +26,5 @@ class SuccessfulReplyTopicTests(ReplyTopicTestCase):
         '''
         response = self.client.post(self.url, data={'message': 'test-message'})
         url = reverse('topic_posts', kwargs={'board_pk': self.board.pk, 'topic_pk': self.topic.pk})
-        topic_posts_url = '{url}?page=1#2'.format(url=url)
+        topic_posts_url = f'{url}?page=1#{self.topic.posts.last().pk}'
         self.assertRedirects(response, topic_posts_url)
-
-
-class InvalidReplyTopicTests(ReplyTopicTestCase):
-    pass

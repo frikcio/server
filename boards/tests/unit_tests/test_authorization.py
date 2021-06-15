@@ -1,20 +1,21 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 
-from user_authentication.auth_form import RegisterForm
+from accounts.auth_form import RegisterForm
+from accounts.views import RegisterView
 
 
-class SignUpTests(TestCase):
+class RegisterViewTests(TestCase):
     def setUp(self):
-        url = reverse('signup')
+        url = reverse('register')
         self.response = self.client.get(url)
 
     def test_signup_status_code(self):
         self.assertEquals(self.response.status_code, 200)
 
     def test_signup_url_resolves_signup_view(self):
-        view = resolve('/signup/')
-        self.assertEquals(view.func, signup)
+        view = resolve('/register/')
+        self.assertEquals(view.func.view_class, RegisterView)
 
     def test_csrf(self):
         self.assertContains(self.response, 'csrfmiddlewaretoken')

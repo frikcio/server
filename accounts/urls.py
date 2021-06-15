@@ -6,7 +6,7 @@ from django.contrib.auth.views import PasswordChangeDoneView as ChangeDone
 
 from django.urls import path
 
-from user_authentication.views import *
+from accounts.views import *
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
