@@ -13,9 +13,10 @@ class ReplyTopicTestCase(TestCase):
         self.username = 'john'
         self.password = '123'
         user = User.objects.create_user(username=self.username, email='john@doe.com', password=self.password)
-        self.topic = TopicModel.objects.create(name='Hello, world', board=self.board, starter=user)
+        self.client.force_login(user=user)
+        self.topic = TopicModel.objects.create(name='Hello, world', board=self.board, owner=user)
         PostModel.objects.create(message='Lorem ipsum dolor sit amet', topic=self.topic, created_by=user)
-        self.url = reverse('reply_topic', kwargs={'pk': self.board.pk, 'topic_pk': self.topic.pk})
+        self.url = reverse('reply_topic', kwargs={'board_pk': self.board.pk, 'topic_pk': self.topic.pk})
 
 
 class LoginRequiredReplyTopicTests(ReplyTopicTestCase):
@@ -27,7 +28,14 @@ class ReplyTopicTests(ReplyTopicTestCase):
 
 
 class SuccessfulReplyTopicTests(ReplyTopicTestCase):
-    pass
+    def test_redirection(self):
+        '''
+        A valid form submission should redirect the user
+        '''
+        response = self.client.post(self.url, data={'message': 'test-message'})
+        url = reverse('topic_posts', kwargs={'board_pk': self.board.pk, 'topic_pk': self.topic.pk})
+        topic_posts_url = '{url}?page=1#2'.format(url=url)
+        self.assertRedirects(response, topic_posts_url)
 
 
 class InvalidReplyTopicTests(ReplyTopicTestCase):

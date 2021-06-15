@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import ListView, CreateView, UpdateView
 
@@ -12,14 +13,14 @@ from boards.site_forms import NewTopicForm, PostForm
 class BoardListView(ListView):
     model = BoardModel
     context_object_name = 'boards'
-    template_name = 'board_templates/home.html'
+    template_name = 'board/home.html'
     paginate_by = 5
 
 
 class TopicListView(ListView):
     model = TopicModel
     context_object_name = 'topics'
-    template_name = 'board_templates/board_topics.html'
+    template_name = 'board/board_topics.html'
     paginate_by = 20
 
     def get_context_data(self, **kwargs):
@@ -34,7 +35,7 @@ class TopicListView(ListView):
 
 class NewTopicView(LoginRequiredMixin, CreateView):
     form_class = NewTopicForm
-    template_name = 'board_templates/new_topic.html'
+    template_name = 'board/new_topic.html'
     pk_url_kwarg = 'board_pk'
     login_url = '/login/'
 
@@ -58,7 +59,7 @@ class NewTopicView(LoginRequiredMixin, CreateView):
 class PostListView(ListView):
     model = PostModel
     context_object_name = 'posts'
-    template_name = 'board_templates/topic_posts.html'
+    template_name = 'board/topic_posts.html'
     paginate_by = 2
 
     def get_context_data(self, **kwargs):
@@ -79,7 +80,7 @@ class PostListView(ListView):
 
 class ReplyTopicView(LoginRequiredMixin, CreateView):
     form_class = PostForm
-    template_name = 'board_templates/reply_topic.html'
+    template_name = 'board/reply_topic.html'
     pk_url_kwarg = 'board_pk'
     login_url = '/login/'
 
@@ -92,7 +93,13 @@ class ReplyTopicView(LoginRequiredMixin, CreateView):
             post.save()
             topic.last_updated = timezone.now()
             topic.save()
-        return redirect('topic_posts', board_pk=post.topic.board.pk, topic_pk=post.topic.pk)
+        topic_url = reverse('topic_posts', kwargs={'board_pk': topic.board.pk, 'topic_pk': topic.pk})
+        topic_post_url = '{url}?page={page}#{id}'.format(
+            url=topic_url,
+            id=post.pk,
+            page=topic.get_page_count()
+        )
+        return redirect(topic_post_url)
 
     def get_context_data(self, **kwargs):
         kwargs['topic'] = TopicModel.objects.get(pk=self.kwargs['topic_pk'])
@@ -102,7 +109,7 @@ class ReplyTopicView(LoginRequiredMixin, CreateView):
 class PostUpdateView(LoginRequiredMixin, UpdateView):
     model = PostModel
     fields = ('message',)
-    template_name = 'board_templates/edit_post.html'
+    template_name = 'board/edit_post.html'
     pk_url_kwarg = 'post_pk'
     context_object_name = 'post'
 

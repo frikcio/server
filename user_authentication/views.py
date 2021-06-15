@@ -10,7 +10,7 @@ from user_authentication.auth_form import RegisterForm
 
 class RegisterView(CreateView):
     form_class = RegisterForm
-    template_name = 'authentication/register.html'
+    template_name = 'accounts/register.html'
 
     def form_valid(self, form):
         user = form.save()
@@ -21,7 +21,7 @@ class RegisterView(CreateView):
 class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     fields = ('first_name', 'last_name', 'email', )
-    template_name = 'authentication/profile.html'
+    template_name = 'accounts/profile.html'
     success_url = reverse_lazy('profile')
 
     def get_object(self, queryset=None):
