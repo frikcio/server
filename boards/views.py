@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.views.generic import ListView, CreateView, UpdateView
 
 from boards.models import BoardModel, TopicModel, PostModel
-from boards.site_forms import NewTopicForm, PostForm
+from boards.forms import NewTopicForm, PostForm
 
 
 class BoardListView(ListView):

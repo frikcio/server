@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 
-from accounts.auth_form import RegisterForm
+from accounts.forms import RegisterForm
 from accounts.views import RegisterView
 
 

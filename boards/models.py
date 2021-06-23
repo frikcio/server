@@ -1,10 +1,27 @@
+import datetime
 import math
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.html import mark_safe
 from django.utils.text import Truncator
 from markdown import markdown
+
+
+class UserModel(AbstractUser):
+    avatar = models.ImageField(blank=True, null=True)
+    email = models.EmailField(unique=True, blank=False, null=False)
+    confirm_email = models.BooleanField(default=False)
+    birth_date = models.DateField(blank=True, null=True)
+
+    @property
+    def age(self):
+        return int((datetime.datetime.now().date() - self.birth_date).days / 365.25)
+
+
+class TokenModel(models.Model):
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True)
+    token = models.CharField(max_length=120, null=True)
 
 
 class BoardModel(models.Model):
@@ -26,7 +43,7 @@ class BoardModel(models.Model):
 class TopicModel(models.Model):
     name = models.CharField(max_length=225)
     board = models.ForeignKey(BoardModel, on_delete=models.CASCADE, related_name='topics')
-    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='topics')
+    owner = models.ForeignKey(UserModel, on_delete=models.DO_NOTHING, related_name='topics')
     last_update = models.DateTimeField(auto_now_add=True)
     views = models.PositiveIntegerField(default=0)
 
@@ -52,13 +69,14 @@ class TopicModel(models.Model):
     def get_last_ten_posts(self):
         return self.posts.order_by('-created_at')[:10]
 
+
 class PostModel(models.Model):
     message = models.TextField(max_length=4000)
     topic = models.ForeignKey(TopicModel, on_delete=models.DO_NOTHING, related_name='posts')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
-    created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='posts')
-    updated_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, related_name='+')
+    created_by = models.ForeignKey(UserModel, on_delete=models.DO_NOTHING, related_name='posts')
+    updated_by = models.ForeignKey(UserModel, on_delete=models.DO_NOTHING, null=True, related_name='+')
 
     def __str__(self):
         truncated_message = Truncator(self.message)

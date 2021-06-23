@@ -1,11 +1,14 @@
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.db import transaction
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
+from django.views import View
 from django.views.generic import CreateView, UpdateView
 
-from accounts.auth_form import RegisterForm
+from accounts.forms import RegisterForm
+from boards.models import UserModel, TokenModel
 
 
 class RegisterView(CreateView):
@@ -13,14 +16,17 @@ class RegisterView(CreateView):
     template_name = 'accounts/register.html'
 
     def form_valid(self, form):
-        user = form.save()
+        with transaction.atomic():
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
         login(self.request, user)
         return redirect('home')
 
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
-    model = User
-    fields = ('first_name', 'last_name', 'email', )
+    model = UserModel
+    fields = ('first_name', 'last_name', 'email',)
     template_name = 'accounts/profile.html'
     success_url = reverse_lazy('profile')
 

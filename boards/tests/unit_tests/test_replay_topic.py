@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from boards.models import BoardModel, User, TopicModel, PostModel
+from boards.models import BoardModel, UserModel, TopicModel, PostModel
 
 
 class ReplyTopicTestCase(TestCase):
@@ -12,7 +12,7 @@ class ReplyTopicTestCase(TestCase):
         self.board = BoardModel.objects.create(name='Django', description='Django board.')
         self.username = 'john'
         self.password = '123'
-        user = User.objects.create_user(username=self.username, email='john@doe.com', password=self.password)
+        user = UserModel.objects.create_user(username=self.username, email='john@doe.com', password=self.password)
         self.client.force_login(user=user)
         self.topic = TopicModel.objects.create(name='Hello, world', board=self.board, owner=user)
         PostModel.objects.create(message='Lorem ipsum dolor sit amet', topic=self.topic, created_by=user)

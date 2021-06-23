@@ -1,15 +1,15 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 
-from boards.models import BoardModel, User, TopicModel, PostModel
-from boards.site_forms import NewTopicForm
+from boards.models import BoardModel, UserModel, TopicModel, PostModel
+from boards.forms import NewTopicForm
 from boards.views import NewTopicView
 
 
 class TestNewTopic(TestCase):
     def setUp(self):
         self.board = BoardModel.objects.create(name='Django', description='Django board.')
-        user = User.objects.create_user(username='john', email='john@doe.com', password='123')
+        user = UserModel.objects.create_user(username='john', email='john@doe.com', password='123')
         self.client.force_login(user=user)
 
     def test_new_topic_view_success_status_code(self):
