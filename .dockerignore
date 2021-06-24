@@ -1,8 +1,0 @@
-.idea
-.DS_Store
-.git/
-.sass-cache
-.vagrant/
-__pycache__
-boards/media/
-Dockerfile

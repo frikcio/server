@@ -1,8 +1,8 @@
-version: '3'
+version: '2'
    
 services:
   db:
-    container_name: db
+    container_name: boards_db
     image: postgres:13.3
     volumes:
       - db:/var/lib/postgresql/data
@@ -16,21 +16,30 @@ services:
       - django_db_net
 
   server:
-    build: .
-    container_name: server
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    build: server/
+    container_name: boards_server
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:${SERVER_PORT}"
     ports:
-      - "8000:8000"
+      - "${SERVER_PORT}:${SERVER_PORT}"
     volumes:
-      - .:/server
-      - ../media_storage:/server/boards/media/
+      - ./server/:/home/server
+      - ../media_storage:/home/server/boards/media/
+    env_file:
+      - .env
     depends_on:
       - db
     networks: 
       - django_db_net
     restart: on-failure
+
+  redis:
+    container_name: boards_redis
+    image: redis:6.2
+    restart: always
+  
 volumes:
   db:
   media_storage:
+  server:
 networks:
   django_db_net:
