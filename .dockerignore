@@ -4,5 +4,5 @@
 .sass-cache
 .vagrant/
 __pycache__
-boards/media
+boards/media/
 Dockerfile

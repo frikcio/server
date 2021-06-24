@@ -5,7 +5,7 @@ services:
     container_name: db
     image: postgres:13.3
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
     env_file:
       - .env
     environment:
@@ -23,6 +23,7 @@ services:
       - "8000:8000"
     volumes:
       - .:/server
+      - ../media_storage:/server/boards/media/
     depends_on:
       - db
     networks: 
@@ -30,5 +31,6 @@ services:
     restart: on-failure
 volumes:
   db:
+  media_storage:
 networks:
   django_db_net:
