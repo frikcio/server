@@ -37,6 +37,8 @@ services:
     image: redis:6.2
     restart: always
     command: redis-server
+    networks:
+      - django_db_net
 
   celery:
     build: server/
@@ -48,6 +50,8 @@ services:
       - ./server/:/home/server
     links:
       - redis
+    networks:
+      - django_db_net
     depends_on:
       - server
       - redis

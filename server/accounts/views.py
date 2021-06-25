@@ -1,6 +1,5 @@
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.tokens import default_token_generator
 from django.db import transaction
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
@@ -9,7 +8,7 @@ from django.views.generic import CreateView, UpdateView
 
 from accounts.forms import RegisterForm
 from boards.models import UserModel, TokenModel
-from django.core.mail import send_mail
+from .tasks import send_email
 
 
 class RegisterView(CreateView):
@@ -21,7 +20,9 @@ class RegisterView(CreateView):
             user = form.save(commit=False)
             user.is_active = False
             user.save()
-            send_email.delay(user)
+            user_pk = user.pk
+            absolute_url = self.request.build_absolute_uri('/')
+            send_email.delay(user_pk, absolute_url)
         login(self.request, user)
         return redirect('home')
 
