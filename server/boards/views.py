@@ -8,6 +8,7 @@ from django.views.generic import ListView, CreateView, UpdateView
 
 from boards.models import BoardModel, TopicModel, PostModel
 from boards.forms import NewTopicForm, PostForm
+from celery import shared_task
 
 
 class BoardListView(ListView):
@@ -107,6 +108,7 @@ class ReplyTopicView(LoginRequiredMixin, CreateView):
 
 
 class PostUpdateView(LoginRequiredMixin, UpdateView):
+    login_url = '/login/'
     model = PostModel
     fields = ('message',)
     template_name = 'board/edit_post.html'
@@ -123,6 +125,3 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
         post.updated_at = timezone.now()
         post.save()
         return redirect('topic_posts', board_pk=post.topic.board.pk, topic_pk=post.topic.pk)
-
-    def form_invalid(self, form):
-        print("")

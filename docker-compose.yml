@@ -36,10 +36,23 @@ services:
     container_name: boards_redis
     image: redis:6.2
     restart: always
+    command: redis-server
+
+  celery:
+    build: server/
+    env_file:
+      - .env
+    container_name: boards_celery
+    command: celery -A server worker -l INFO
+    volumes:
+      - ./server/:/home/server
+    links:
+      - redis
+    depends_on:
+      - server
+      - redis
   
 volumes:
   db:
-  media_storage:
-  server:
 networks:
   django_db_net:

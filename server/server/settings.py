@@ -127,10 +127,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 APPEND_SLASH = True
 
+AUTH_USER_MODEL = "boards.UserModel"
+LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
-LOGIN_REDIRECT_URL = 'home'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-AUTH_USER_MODEL = "boards.UserModel"
+
+
+CELERY_BROKER_URL = 'redis://boards_redis:6379'
+CELERY_ACCEPT_CONTENT = ['json'] 
+CELERY_TASK_SERIALIZER = 'json'

@@ -9,6 +9,7 @@ from django.views.generic import CreateView, UpdateView
 
 from accounts.forms import RegisterForm
 from boards.models import UserModel, TokenModel
+from django.core.mail import send_mail
 
 
 class RegisterView(CreateView):
@@ -20,6 +21,12 @@ class RegisterView(CreateView):
             user = form.save(commit=False)
             user.is_active = False
             user.save()
+            send_mail('Subject here', 'Here is the message.', 
+                'frikcio67@gmail.com',
+                [user.email],
+                fail_silently=False,
+            )
+            user.email_user(subject=user, message='test')
         login(self.request, user)
         return redirect('home')
 
