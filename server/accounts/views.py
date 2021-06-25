@@ -21,12 +21,7 @@ class RegisterView(CreateView):
             user = form.save(commit=False)
             user.is_active = False
             user.save()
-            send_mail('Subject here', 'Here is the message.', 
-                'frikcio67@gmail.com',
-                [user.email],
-                fail_silently=False,
-            )
-            user.email_user(subject=user, message='test')
+            send_email.delay(user)
         login(self.request, user)
         return redirect('home')
 
