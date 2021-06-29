@@ -8,8 +8,6 @@ from django.views.generic import ListView, CreateView, UpdateView
 
 from boards.models import BoardModel, TopicModel, PostModel
 from boards.forms import NewTopicForm, PostForm
-from celery import shared_task
-
 
 class BoardListView(ListView):
     model = BoardModel
