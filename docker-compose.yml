@@ -55,6 +55,7 @@ services:
     depends_on:
       - server
       - redis
+    restart: always
   
 volumes:
   db:
