@@ -1,15 +1,11 @@
-from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.tokens import default_token_generator
-from django.db import transaction
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.views import View
 from django.views.generic import CreateView, UpdateView
 
 from accounts.forms import RegisterForm
 from boards.models import UserModel, TokenModel
-from django.core.mail import send_mail
+from .tasks import send_verification_email
 
 
 class RegisterView(CreateView):
@@ -17,12 +13,12 @@ class RegisterView(CreateView):
     template_name = 'accounts/register.html'
 
     def form_valid(self, form):
-        with transaction.atomic():
-            user = form.save(commit=False)
-            user.is_active = False
-            user.save()
-            send_email.delay(user)
-        login(self.request, user)
+        user = form.save(commit=False)
+        user.is_active = False
+        user.save()
+        user_pk = user.pk
+        absolute_url = self.request.build_absolute_uri('/')
+        send_verification_email.delay(user_pk, absolute_url)
         return redirect('home')
 
 
@@ -34,3 +30,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_object(self, queryset=None):
         return self.request.user
+
+
+class AccountActivateView(UpdateView):
+    pass
