@@ -1,13 +1,13 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 
-from boards.models import BoardModel
+from boards.models import Board
 from boards.views import BoardListView, TopicListView
 
 
 class TestHome(TestCase):
     def setUp(self):
-        self.board = BoardModel.objects.create(name='Django', description='django description')
+        self.board = Board.objects.create(name='Django', description='django description')
         url = reverse('home')
         self.response = self.client.get(url)
 
@@ -25,7 +25,7 @@ class TestHome(TestCase):
 
 class TestBoardTopics(TestCase):
     def setUp(self):
-        self.board = BoardModel.objects.create(name='Django', description='django description')
+        self.board = Board.objects.create(name='Django', description='django description')
         self.board_topics_url = reverse('board_topics', kwargs={'board_pk': self.board.pk})
         self.home_url = reverse('home')
 

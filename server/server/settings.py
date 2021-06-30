@@ -127,7 +127,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 APPEND_SLASH = True
 
-AUTH_USER_MODEL = "boards.UserModel"
+AUTH_USER_MODEL = "boards.User"
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
@@ -140,3 +140,4 @@ CELERY_RESULT_BACKEND = 'redis://boards_redis:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ALWAYS_EAGER = True

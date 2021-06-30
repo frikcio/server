@@ -6,12 +6,12 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.generic import ListView, CreateView, UpdateView
 
-from .models import BoardModel, TopicModel, PostModel
+from .models import Board, Topic, Post
 from .forms import NewTopicForm, PostForm
 
 
 class NewBoardView(LoginRequiredMixin, CreateView):
-    model = BoardModel
+    model = Board
     template_name = 'board/new_board.html'
     fields = ('name', 'description')
     login_url = '/login/'
@@ -19,14 +19,14 @@ class NewBoardView(LoginRequiredMixin, CreateView):
 
 
 class BoardListView(ListView):
-    model = BoardModel
+    model = Board
     context_object_name = 'boards'
     template_name = 'board/home.html'
     paginate_by = 5
 
 
 class TopicListView(ListView):
-    model = TopicModel
+    model = Topic
     context_object_name = 'topics'
     template_name = 'board/board_topics.html'
     paginate_by = 20
@@ -36,7 +36,7 @@ class TopicListView(ListView):
         return super().get_context_data(**kwargs)
 
     def get_queryset(self):
-        self.board = get_object_or_404(BoardModel, pk=self.kwargs.get('board_pk'))
+        self.board = get_object_or_404(Board, pk=self.kwargs.get('board_pk'))
         queryset = self.board.topics.order_by('-last_update').annotate(replies=Count('posts'))
         return queryset
 
@@ -49,10 +49,10 @@ class NewTopicView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         topic = form.save(commit=False)
-        topic.board = BoardModel.objects.get(pk=self.kwargs['board_pk'])
+        topic.board = Board.objects.get(pk=self.kwargs['board_pk'])
         topic.owner = self.request.user
         topic.save()
-        PostModel.objects.create(
+        Post.objects.create(
             message=form.cleaned_data.get('message'),
             topic=topic,
             created_by=self.request.user
@@ -60,12 +60,12 @@ class NewTopicView(LoginRequiredMixin, CreateView):
         return redirect('topic_posts', board_pk=topic.board.pk, topic_pk=topic.pk)
 
     def get_context_data(self, **kwargs):
-        kwargs['board'] = BoardModel.objects.get(pk=self.kwargs['board_pk'])
+        kwargs['board'] = Board.objects.get(pk=self.kwargs['board_pk'])
         return super().get_context_data(**kwargs)
 
 
 class PostListView(ListView):
-    model = PostModel
+    model = Post
     context_object_name = 'posts'
     template_name = 'board/topic_posts.html'
     paginate_by = 2
@@ -80,7 +80,7 @@ class PostListView(ListView):
         return super().get_context_data(**kwargs)
 
     def get_queryset(self):
-        self.topic = get_object_or_404(TopicModel, board__pk=self.kwargs.get('board_pk'),
+        self.topic = get_object_or_404(Topic, board__pk=self.kwargs.get('board_pk'),
                                        pk=self.kwargs.get('topic_pk'))
         queryset = self.topic.posts.order_by('created_at')
         return queryset
@@ -94,7 +94,7 @@ class ReplyTopicView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         post = form.save(commit=False)
-        topic = TopicModel.objects.get(pk=self.kwargs['topic_pk'])
+        topic = Topic.objects.get(pk=self.kwargs['topic_pk'])
         post.topic = topic
         post.created_by = self.request.user
         with transaction.atomic():
@@ -110,13 +110,13 @@ class ReplyTopicView(LoginRequiredMixin, CreateView):
         return redirect(topic_post_url)
 
     def get_context_data(self, **kwargs):
-        kwargs['topic'] = TopicModel.objects.get(pk=self.kwargs['topic_pk'])
+        kwargs['topic'] = Topic.objects.get(pk=self.kwargs['topic_pk'])
         return super().get_context_data(**kwargs)
 
 
 class PostUpdateView(LoginRequiredMixin, UpdateView):
     login_url = '/login/'
-    model = PostModel
+    model = Post
     fields = ('message',)
     template_name = 'board/edit_post.html'
     pk_url_kwarg = 'post_pk'

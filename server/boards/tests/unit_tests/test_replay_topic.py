@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from boards.models import BoardModel, UserModel, TopicModel, PostModel
+from boards.models import Board, User, Topic, Post
 
 
 class ReplyTopicTestCase(TestCase):
@@ -9,13 +9,13 @@ class ReplyTopicTestCase(TestCase):
     Base test case to be used in all `reply_topic` view tests
     '''
     def setUp(self):
-        self.board = BoardModel.objects.create(name='Django', description='Django board.')
+        self.board = Board.objects.create(name='Django', description='Django board.')
         self.username = 'john'
         self.password = '123'
-        user = UserModel.objects.create_user(username=self.username, email='john@doe.com', password=self.password)
+        user = User.objects.create_user(username=self.username, email='john@doe.com', password=self.password)
         self.client.force_login(user=user)
-        self.topic = TopicModel.objects.create(name='Hello, world', board=self.board, owner=user)
-        PostModel.objects.create(message='Lorem ipsum dolor sit amet', topic=self.topic, created_by=user)
+        self.topic = Topic.objects.create(name='Hello, world', board=self.board, owner=user)
+        Post.objects.create(message='Lorem ipsum dolor sit amet', topic=self.topic, created_by=user)
         self.url = reverse('reply_topic', kwargs={'board_pk': self.board.pk, 'topic_pk': self.topic.pk})
 
 

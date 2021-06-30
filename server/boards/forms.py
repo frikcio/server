@@ -1,6 +1,6 @@
 from django import forms
 
-from boards.models import TopicModel, PostModel
+from boards.models import Topic, Post
 
 
 class NewTopicForm(forms.ModelForm):
@@ -8,11 +8,11 @@ class NewTopicForm(forms.ModelForm):
                               max_length=4000, help_text='The max length of the text is 4000.')
 
     class Meta:
-        model = TopicModel
+        model = Topic
         fields = ['name', 'message']
 
 
 class PostForm(forms.ModelForm):
     class Meta:
-        model = PostModel
+        model = Post
         fields = ['message']
