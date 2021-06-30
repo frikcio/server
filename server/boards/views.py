@@ -2,12 +2,21 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.generic import ListView, CreateView, UpdateView
 
-from boards.models import BoardModel, TopicModel, PostModel
-from boards.forms import NewTopicForm, PostForm
+from .models import BoardModel, TopicModel, PostModel
+from .forms import NewTopicForm, PostForm
+
+
+class NewBoardView(LoginRequiredMixin, CreateView):
+    model = BoardModel
+    template_name = 'board/new_board.html'
+    fields = ('name', 'description')
+    login_url = '/login/'
+    success_url = reverse_lazy('home')
+
 
 class BoardListView(ListView):
     model = BoardModel
