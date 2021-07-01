@@ -35,13 +35,13 @@ Open a terminal window and update the local repository with:
 	sudo systemctl start docker
 ```
 
-	Then, enable it to run at startup:
+Then, enable it to run at startup:
 
 ```
 	sudo systemctl enable docker
 ```
 
-	To check the status of the service, run:
+To check the status of the service, run:
 
 ```
 	sudo systemctl status docker
