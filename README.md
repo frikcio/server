@@ -10,13 +10,13 @@ docker --version
 	###Step 1: Updating the Local Repository
 
 	Open a terminal window and update the local repository with:
-```console
+	```console
 	sudo apt update
-```
+	```
 	###Step 2: Installing Docker
-```console
+	```console
 	sudo apt install docker.io
-```
+	```
 	###Step 3: Checking Docker Installation
 ```console
 	docker --version
