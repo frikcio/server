@@ -62,6 +62,8 @@ class AccountActivateView(DetailView):
                 session_token = self.request.session.get(ACCOUNT_VERIFICATION_TOKEN)
                 if self.token_generator.check_token(self.user, session_token):
                     self.valid_link = True
+                    self.user.is_active = True
+                    self.user.save()
                     login(self.request, self.user)
                     return HttpResponseRedirect(self.success_url)
             else:
@@ -76,8 +78,6 @@ class AccountActivateView(DetailView):
         try:
             user_pk = base64.urlsafe_b64decode(self.kwargs['uid64']).decode()
             user = User.objects.get(pk=user_pk)
-            user.is_active = True
-            user.save()
         except (TypeError, ValueError, OverflowError, User.DoesNotExist, KeyError):
             user = None
         return user
@@ -86,9 +86,7 @@ class AccountActivateView(DetailView):
         #   if all alright - add "valid_link=True" to template, else - "valid_link=False" and "form=None"
         self.object = self.get_user()
         context = super().get_context_data(**kwargs)
-        if self.valid_link:
-            context['valid_link'] = True
-        else:
+        if not self.valid_link:
             context.update({
                 'title': 'Fail account verification',
                 'valid_link': False,
