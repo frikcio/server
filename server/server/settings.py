@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'boards.apps.BoardsConfig',
     'widget_tweaks',
     'django.contrib.humanize',
+    'accounts'
 ]
 
 MIDDLEWARE = [

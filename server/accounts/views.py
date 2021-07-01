@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, DetailView
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import login
 from django.utils.decorators import method_decorator
@@ -12,8 +12,8 @@ from django.views.decorators.cache import never_cache
 import base64
 
 from .forms import RegisterForm
-from boards.models import User, TokenModel
 from .tasks import send_verification_email
+from .models import User
 
 
 class RegisterView(CreateView):
@@ -43,7 +43,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
 ACCOUNT_VERIFICATION_TOKEN = "_verification_token"
 
 
-class AccountActivateView(UpdateView):
+class AccountActivateView(DetailView):
     activate_ulr_token = 'activate_user'
     token_generator = default_token_generator
     template_name = 'accounts/register.html'
@@ -55,7 +55,7 @@ class AccountActivateView(UpdateView):
         #   check link if True - activate user and redirect on user's profile page,
         #   if False - display message that link is not valid
         self.valid_link = False
-        self.user = self.get_object()
+        self.user = self.get_user()
         if self.user is not None:
             token = kwargs['token']
             if token == self.activate_ulr_token:
@@ -71,26 +71,26 @@ class AccountActivateView(UpdateView):
                     return HttpResponseRedirect(redirect_url)
         return self.render_to_response(self.get_context_data())
 
-    def get_object(self, queryset=None):
+    def get_user(self):
         #   return user if user has exist and None if not
         try:
             user_pk = base64.urlsafe_b64decode(self.kwargs['uid64']).decode()
             user = User.objects.get(pk=user_pk)
             user.is_active = True
             user.save()
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist, KeyError):
             user = None
         return user
 
     def get_context_data(self, **kwargs):
         #   if all alright - add "valid_link=True" to template, else - "valid_link=False" and "form=None"
-        self.object = self.get_object()
+        self.object = self.get_user()
         context = super().get_context_data(**kwargs)
         if self.valid_link:
             context['valid_link'] = True
         else:
             context.update({
-                'title': 'fail account verification',
+                'title': 'Fail account verification',
                 'valid_link': False,
                 'form': None,
             })
