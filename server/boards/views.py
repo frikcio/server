@@ -75,7 +75,7 @@ class PostListView(ListView):
     paginate_by = 2
 
     def get_context_data(self, **kwargs):
-        #   Update topic's view, when template rendering and append ne value to topic_posts template
+        #   Update topic's view, when template rendering and append new value to topic_posts template
         session_key = f'viewed_topic_{self.topic.pk}'
         if not self.request.session.get(session_key, False):
             self.topic.views += 1
@@ -86,8 +86,7 @@ class PostListView(ListView):
 
     def get_queryset(self):
         #    get posts only for curtain topic and oder by created at
-        self.topic = get_object_or_404(Topic, board__pk=self.kwargs.get('board_pk'),
-                                       pk=self.kwargs.get('topic_pk'))
+        self.topic = get_object_or_404(Topic, board__pk=self.kwargs.get('board_pk'), pk=self.kwargs.get('topic_pk'))
         queryset = self.topic.posts.order_by('created_at')
         return queryset
 
@@ -106,14 +105,9 @@ class ReplyTopicView(LoginRequiredMixin, CreateView):
         post.created_by = self.request.user
         with transaction.atomic():
             post.save()
-            topic.last_updated = timezone.now()
             topic.save()
         topic_url = reverse('topic_posts', kwargs={'board_pk': topic.board.pk, 'topic_pk': topic.pk})
-        topic_post_url = '{url}?page={page}#{id}'.format(
-            url=topic_url,
-            id=post.pk,
-            page=topic.get_page_count()
-        )
+        topic_post_url = f'{topic_url}?page={topic.get_page_count()}#{post.pk}'
         return redirect(topic_post_url)
 
     def get_context_data(self, **kwargs):
