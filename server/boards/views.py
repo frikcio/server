@@ -136,7 +136,7 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
         return queryset.filter(created_by=self.request.user)
 
     def form_valid(self, form):
-        #   Update post's updated by and updated at
+        #   Update post's updated by
         post = form.save(commit=False)
         post.updated_by = self.request.user
         post.updated_at = timezone.now()
