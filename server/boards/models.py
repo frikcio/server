@@ -1,11 +1,11 @@
 import math
 
+from markdown import markdown
+
 from django.db import models
 from django.utils.html import mark_safe
 from django.utils.text import Truncator
-from markdown import markdown
 
-from accounts.models import User
 from server import settings
 
 

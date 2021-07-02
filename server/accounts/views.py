@@ -1,19 +1,21 @@
+import base64
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth import login
+from django.contrib.auth import login, get_user_model
 from django.utils.decorators import method_decorator
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 
-import base64
-
 from .forms import RegisterForm
 from .tasks import send_verification_email
-from .models import User
+
+
+USER = get_user_model()
 
 
 class RegisterView(CreateView):
@@ -31,7 +33,7 @@ class RegisterView(CreateView):
 
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
-    model = User
+    model = USER
     fields = ('first_name', 'last_name')
     template_name = 'accounts/profile.html'
     success_url = reverse_lazy('profile')
@@ -77,8 +79,8 @@ class AccountActivateView(DetailView):
         #   return user if user has exist and None if not
         try:
             user_pk = base64.urlsafe_b64decode(self.kwargs['uid64']).decode()
-            user = User.objects.get(pk=user_pk)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist, KeyError):
+            user = USER.objects.get(pk=user_pk)
+        except (TypeError, ValueError, OverflowError, USER.DoesNotExist, KeyError):
             user = None
         return user
 

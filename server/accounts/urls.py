@@ -2,7 +2,6 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, 
     PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView, PasswordChangeDoneView
 
 from django.urls import path
-
 from .views import *
 
 urlpatterns = [

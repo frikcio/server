@@ -1,10 +1,13 @@
-from django.test import TestCase
-from django.urls import reverse
 from faker import Factory
 
-from boards.models import User
+from django.test import TestCase
+from django.urls import reverse
+from django.contrib.auth import get_user_model
 
 fake = Factory.create()
+
+
+USER = get_user_model()
 
 
 class RegistrationTest(TestCase):
@@ -21,11 +24,11 @@ class RegistrationTest(TestCase):
     def test_user_is_created(self):
         # Check that user is created
         self.client.post(self.url, self.data)
-        queryset = User.objects.all()
+        queryset = USER.objects.all()
         self.assertEquals(queryset.count(), 1)
 
     def test_user_is_not_active(self):
         # Check that user is created and not active
         self.client.post(self.url, self.data)
-        user = User.objects.first()
+        user = USER.objects.first()
         self.assertFalse(user.is_active)
