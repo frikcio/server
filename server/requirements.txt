@@ -20,3 +20,5 @@ six==1.16.0
 sqlparse==0.4.1
 vine==5.0.0
 wcwidth==0.2.5
+
+Faker~=8.9.0
