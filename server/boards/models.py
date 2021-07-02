@@ -29,7 +29,7 @@ class Topic(models.Model):
     name = models.CharField(max_length=225)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='topics')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name='topics')
-    last_update = models.DateTimeField(auto_now_add=True)
+    last_update = models.DateTimeField(auto_now=True)
     views = models.PositiveIntegerField(default=0)
 
     def __str__(self):
