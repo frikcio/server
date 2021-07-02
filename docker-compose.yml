@@ -13,7 +13,7 @@ services:
       - POSTGRES_USER=$DB_USER
       - POSTGRES_PASSWORD=$DB_PASSWORD
     networks: 
-      - django_db_net
+      - server_net
 
   server:
     build: server/
@@ -29,7 +29,7 @@ services:
     depends_on:
       - db
     networks: 
-      - django_db_net
+      - server_net
     restart: on-failure
 
   redis:
@@ -38,7 +38,7 @@ services:
     restart: always
     command: redis-server
     networks:
-      - django_db_net
+      - server_net
 
   celery:
     build: server/
@@ -51,7 +51,7 @@ services:
     links:
       - redis
     networks:
-      - django_db_net
+      - server_net
     depends_on:
       - server
       - redis
@@ -60,4 +60,4 @@ services:
 volumes:
   db:
 networks:
-  django_db_net:
+  server_net:
