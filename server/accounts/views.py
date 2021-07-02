@@ -15,7 +15,7 @@ from .forms import RegisterForm
 from .tasks import send_verification_email
 
 
-USER = get_user_model()
+User = get_user_model()
 
 
 class RegisterView(CreateView):
@@ -33,7 +33,7 @@ class RegisterView(CreateView):
 
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
-    model = USER
+    model = User
     fields = ('first_name', 'last_name')
     template_name = 'accounts/profile.html'
     success_url = reverse_lazy('profile')
@@ -79,8 +79,8 @@ class AccountActivateView(DetailView):
         #   return user if user has exist and None if not
         try:
             user_pk = base64.urlsafe_b64decode(self.kwargs['uid64']).decode()
-            user = USER.objects.get(pk=user_pk)
-        except (TypeError, ValueError, OverflowError, USER.DoesNotExist, KeyError):
+            user = User.objects.get(pk=user_pk)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist, KeyError):
             user = None
         return user
 

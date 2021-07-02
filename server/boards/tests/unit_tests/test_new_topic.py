@@ -1,10 +1,12 @@
-from django.test import TestCase, RequestFactory
-from django.urls import reverse
 from faker import Factory
 
-from accounts.models import User
+from django.contrib.auth import get_user_model
+from django.test import TestCase
+from django.urls import reverse
+
 from boards.models import Board, Topic, Post
-from boards.views import NewTopicView
+
+User = get_user_model()
 
 fake = Factory.create()
 

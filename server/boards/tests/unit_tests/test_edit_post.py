@@ -1,11 +1,13 @@
-from django.contrib.auth.models import User
+from faker import Factory
+
+from django.contrib.auth import get_user_model
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from faker import Factory
-
-from boards.models import Post, Board, Topic, User
+from boards.models import Post, Board, Topic
 from boards.views import PostUpdateView
+
+User = get_user_model()
 
 fake = Factory.create()
 

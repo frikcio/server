@@ -13,13 +13,13 @@ from accounts.views import AccountActivateView
 
 fake = Factory.create()
 
-USER = get_user_model()
+User = get_user_model()
 
 
 class AccountActivateViewTests(TestCase):
     def setUp(self):
         username = fake.name().split(" ")[0]  # fake.name() return "Name Surname", so I split the string and get "Name"
-        self.user = USER.objects.create_user(username=username,
+        self.user = User.objects.create_user(username=username,
                                              email=fake.email(),
                                              password=fake.password(),
                                              is_active=False)
@@ -36,7 +36,7 @@ class AccountActivateViewTests(TestCase):
     def test_get_user_success(self):
         #   get user if get correctly uid64 or token
         url_user = self.view.get_user()
-        db_user = USER.objects.first()
+        db_user = User.objects.first()
         self.assertEquals(url_user, db_user)
 
     def test_get_user_fail(self):
@@ -58,7 +58,7 @@ class AccountActivateViewTests(TestCase):
         session["_verification_token"] = self.token
         session.save()
         self.client.post(self.activate_url)
-        user = USER.objects.first()
+        user = User.objects.first()
         self.assertTrue(user.is_active)
 
     def test_user_is_not_active(self):
@@ -67,6 +67,6 @@ class AccountActivateViewTests(TestCase):
         session["_verification_token"] = "Some-Wrong_token"
         session.save()
         self.client.post(self.activate_url)
-        user = USER.objects.first()
+        user = User.objects.first()
         self.assertFalse(user.is_active)
 

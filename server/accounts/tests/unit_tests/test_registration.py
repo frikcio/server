@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 fake = Factory.create()
 
 
-USER = get_user_model()
+User = get_user_model()
 
 
 class RegistrationTest(TestCase):
@@ -24,11 +24,11 @@ class RegistrationTest(TestCase):
     def test_user_is_created(self):
         # Check that user is created
         self.client.post(self.url, self.data)
-        queryset = USER.objects.all()
+        queryset = User.objects.all()
         self.assertEquals(queryset.count(), 1)
 
     def test_user_is_not_active(self):
         # Check that user is created and not active
         self.client.post(self.url, self.data)
-        user = USER.objects.first()
+        user = User.objects.first()
         self.assertFalse(user.is_active)
