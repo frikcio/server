@@ -11,7 +11,7 @@ from server import settings
 
 class Board(models.Model):
     name = models.CharField(max_length=120, unique=True)
-    description = models.CharField(max_length=120)
+    description = models.CharField(max_length=400)
 
     def __str__(self):
         return self.name
