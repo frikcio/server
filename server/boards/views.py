@@ -32,10 +32,12 @@ class TopicListView(ListView):
     paginate_by = 20
 
     def get_context_data(self, **kwargs):
+        #   Append new value to board_topics template
         kwargs['board'] = self.board
         return super().get_context_data(**kwargs)
 
     def get_queryset(self):
+        #   get topics only for certain board, order by last update and append posts count for every topic
         self.board = get_object_or_404(Board, pk=self.kwargs.get('board_pk'))
         queryset = self.board.topics.order_by('-last_update').annotate(replies=Count('posts'))
         return queryset
@@ -48,6 +50,7 @@ class NewTopicView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
 
     def form_valid(self, form):
+        #   Create new topic and first post for this topic
         topic = form.save(commit=False)
         topic.board = Board.objects.get(pk=self.kwargs['board_pk'])
         topic.owner = self.request.user
@@ -60,6 +63,7 @@ class NewTopicView(LoginRequiredMixin, CreateView):
         return redirect('topic_posts', board_pk=topic.board.pk, topic_pk=topic.pk)
 
     def get_context_data(self, **kwargs):
+        #   Append new value to new_topic template
         kwargs['board'] = Board.objects.get(pk=self.kwargs['board_pk'])
         return super().get_context_data(**kwargs)
 
@@ -71,7 +75,8 @@ class PostListView(ListView):
     paginate_by = 2
 
     def get_context_data(self, **kwargs):
-        session_key = 'viewed_topic_{}'.format(self.topic.pk)
+        #   Update topic's view, when template rendering and append ne value to topic_posts template
+        session_key = f'viewed_topic_{self.topic.pk}'
         if not self.request.session.get(session_key, False):
             self.topic.views += 1
             self.topic.save()
@@ -80,6 +85,7 @@ class PostListView(ListView):
         return super().get_context_data(**kwargs)
 
     def get_queryset(self):
+        #    get posts only for curtain topic and oder by created at
         self.topic = get_object_or_404(Topic, board__pk=self.kwargs.get('board_pk'),
                                        pk=self.kwargs.get('topic_pk'))
         queryset = self.topic.posts.order_by('created_at')
@@ -93,6 +99,7 @@ class ReplyTopicView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
 
     def form_valid(self, form):
+        #   Create new post update topic's last update and redirect to current posts page
         post = form.save(commit=False)
         topic = Topic.objects.get(pk=self.kwargs['topic_pk'])
         post.topic = topic
@@ -110,6 +117,7 @@ class ReplyTopicView(LoginRequiredMixin, CreateView):
         return redirect(topic_post_url)
 
     def get_context_data(self, **kwargs):
+        #   Append new value to reply_topic template
         kwargs['topic'] = Topic.objects.get(pk=self.kwargs['topic_pk'])
         return super().get_context_data(**kwargs)
 
@@ -123,10 +131,12 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
     context_object_name = 'post'
 
     def get_queryset(self):
+        #   get current user's posts
         queryset = super().get_queryset()
         return queryset.filter(created_by=self.request.user)
 
     def form_valid(self, form):
+        #   Update post's updated by and updated at
         post = form.save(commit=False)
         post.updated_by = self.request.user
         post.updated_at = timezone.now()
