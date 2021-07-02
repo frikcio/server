@@ -1,8 +1,9 @@
 import os
 
 from django.test import TestCase, RequestFactory
-from django.urls import reverse, resolve, reverse_lazy
+from django.urls import reverse
 from django.contrib.auth.tokens import default_token_generator
+from faker import Factory
 
 from boards.models import User
 from accounts.views import AccountActivateView
@@ -10,11 +11,15 @@ from accounts.views import AccountActivateView
 import base64
 
 
+fake = Factory.create()
+
+
 class AccountActivateViewTests(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="test_guy",
-                                             email="test_guy@example.com",
-                                             password="52654936abcdA",
+        username = fake.name().split(" ")[0]  # fake.name() return "Name Surname", so I split the string and get "Name"
+        self.user = User.objects.create_user(username=username,
+                                             email=fake.email(),
+                                             password=fake.password(),
                                              is_active=False)
         self.token = default_token_generator.make_token(self.user)
         uid64 = base64.urlsafe_b64encode(str(self.user.pk).encode()).decode()
@@ -37,7 +42,6 @@ class AccountActivateViewTests(TestCase):
         self.view.kwargs['uid64'] = 'MktR=='
         url_user = self.view.get_user()
         self.assertIsNone(url_user)
-
 
     def test_get_context_data_if_link_is_not_valid(self):
         #   if link is not valid get "title" and "valid_link=False" at the template

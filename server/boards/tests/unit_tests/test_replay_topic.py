@@ -1,30 +1,39 @@
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from boards.models import Board, User, Topic, Post
+from faker import Factory
+
+from accounts.models import User
+from boards.models import Board, Topic, Post
+from boards.views import ReplyTopicView
+
+fake = Factory.create()
 
 
-class ReplyTopicTestCase(TestCase):
-    '''
-    Base test case to be used in all `reply_topic` view tests
-    '''
+class ReplyTopicTests(TestCase):
     def setUp(self):
-        self.board = Board.objects.create(name='Django', description='Django board.')
-        self.username = 'john'
-        self.password = '123'
-        user = User.objects.create_user(username=self.username, email='john@doe.com', password=self.password)
+        username = fake.name().split(" ")[0]  # fake.name() return "Name Surname", so I split the string and get "Name"
+        user = User.objects.create(username=username, email=fake.email(), password=fake.password())
+        board = Board.objects.create(name=fake.word(), description=fake.text())
+        self.topic = Topic.objects.create(name=fake.word(), board=board, owner=user)
         self.client.force_login(user=user)
-        self.topic = Topic.objects.create(name='Hello, world', board=self.board, owner=user)
-        Post.objects.create(message='Lorem ipsum dolor sit amet', topic=self.topic, created_by=user)
-        self.url = reverse('reply_topic', kwargs={'board_pk': self.board.pk, 'topic_pk': self.topic.pk})
+        self.url = reverse("reply_topic", kwargs={"board_pk": board.pk, "topic_pk": self.topic.pk})
 
+    def test_get_context(self):
+        # Check that context will contains new value
+        response = self.client.get(self.url)
+        self.assertIn("topic", response.context)
 
-class SuccessfulReplyTopicTests(ReplyTopicTestCase):
-    def test_redirection(self):
-        '''
-        A valid form submission should redirect the user
-        '''
-        response = self.client.post(self.url, data={'message': 'test-message'})
-        url = reverse('topic_posts', kwargs={'board_pk': self.board.pk, 'topic_pk': self.topic.pk})
-        topic_posts_url = f'{url}?page=1#{self.topic.posts.last().pk}'
-        self.assertRedirects(response, topic_posts_url)
+    def test_post_is_created(self):
+        # Check that post will create
+        response = self.client.post(self.url, data={"message": fake.text()})
+        posts = Post.objects.all()
+        self.assertEqual(posts.count(), 1)
+        self.assertEqual(posts.first().topic, self.topic)
+        self.assertEqual(posts.first().created_by, response.wsgi_request.user)
+
+    def test_topic_is_updated(self):
+        # Check that topic will update when post will create
+        self.client.post(self.url, data={"message": fake.text()})
+        updated_topic = Topic.objects.first()
+        self.assertNotEqual(updated_topic.last_update, self.topic.last_update)

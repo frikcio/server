@@ -1,22 +1,45 @@
-from django.test import TestCase
-from django.urls import reverse, resolve
+from django.test import TestCase, RequestFactory
+from django.urls import reverse
+from faker import Factory
 
 from boards.models import Board, User, Topic, Post
 from boards.views import PostListView
 
+fake = Factory.create()
+
 
 class TopicPostsTests(TestCase):
     def setUp(self):
-        self.board = Board.objects.create(name='Django', description='Django board.')
-        user = User.objects.create_user(username='john', email='john@doe.com', password='123')
-        self.topic = Topic.objects.create(name='Hello, world', board=self.board, owner=user)
-        Post.objects.create(message='Lorem ipsum dolor sit amet', topic=self.topic, created_by=user)
-        url = reverse('topic_posts', kwargs={'board_pk': self.board.pk, 'topic_pk': self.topic.pk})
-        self.response = self.client.get(url)
+        username = fake.name().split(" ")[0]  # fake.name() return "Name Surname", so I split the string and get "Name"
+        board1 = Board.objects.create(name=fake.word(), description=fake.text())
+        board2 = Board.objects.create(name=fake.word(), description=fake.text())
+        user = User.objects.create_user(username=username, email=fake.email(), password=fake.password())
+        self.topic1 = Topic.objects.create(name=fake.word(), board=board1, owner=user)
+        topic2 = Topic.objects.create(name=fake.word(), board=board2, owner=user)
+        self.post1 = Post.objects.create(message=fake.text(), topic=self.topic1, created_by=user)
+        self.post2 = Post.objects.create(message=fake.text(), topic=topic2, created_by=user)
+        kwargs = {'board_pk': board1.pk, 'topic_pk': self.topic1.pk}
+        self.url = reverse('topic_posts', kwargs=kwargs)
+        request = RequestFactory().get(self.url)
+        self.client.force_login(user=user)
+        self.view = PostListView()
+        self.view.setup(request=request)
+        self.view.kwargs.update(kwargs)
 
-    def test_status_code(self):
-        self.assertEquals(self.response.status_code, 200)
+    def test_get_queryset(self):
+        # Check that will get correctly queryset
+        queryset = self.view.get_queryset()
+        self.assertIn(self.post1, queryset)
+        self.assertNotIn(self.post2, queryset)
 
-    def test_view_function(self):
-        view = resolve(f'/board/{self.board.pk}/topic/{self.topic.pk}/')
-        self.assertEquals(view.func.view_class, PostListView)
+    def test_get_context_data(self):
+        # Check that context contains new value
+        response = self.client.get(self.url)
+        self.assertIn("topic", response.context)
+
+    def test_increase_topic_view(self):
+        # Check that topic's views are increase, when render template
+        self.client.get(self.url)
+        topic = Topic.objects.first()
+        self.assertNotEqual(topic.views, self.topic1.views)
+

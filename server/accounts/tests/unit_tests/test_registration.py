@@ -1,26 +1,31 @@
-from django.test import TestCase, RequestFactory
-from django.urls import reverse, resolve
+from django.test import TestCase
+from django.urls import reverse
+from faker import Factory
 
-from server.celery import app
 from boards.models import User
-from accounts.views import RegisterView, send_verification_email
+
+fake = Factory.create()
 
 
 class RegistrationTest(TestCase):
     def setUp(self):
-        self.data = {'username': 'test_guy',
-                     'email': 'test_guy@example.com',
-                     'password1': '52654936abcdA',
-                     'password2': '52654936abcdA',
+        username = fake.name().split(" ")[0]  # fake.name() return "Name Surname", so I split the string and get "Name"
+        password = fake.password()
+        self.data = {'username': username,
+                     'email': fake.email(),
+                     'password1': password,
+                     'password2': password,
                      }
         self.url = reverse('register')
 
     def test_user_is_created(self):
+        # Check that user is created
         self.client.post(self.url, self.data)
         queryset = User.objects.all()
         self.assertEquals(queryset.count(), 1)
 
     def test_user_is_not_active(self):
+        # Check that user is created and not active
         self.client.post(self.url, self.data)
         user = User.objects.first()
         self.assertFalse(user.is_active)

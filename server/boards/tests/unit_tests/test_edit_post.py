@@ -12,8 +12,10 @@ fake = Factory.create()
 
 class TestsPostUpdateView(TestCase):
     def setUp(self):
-        self.user1 = User.objects.create_user(username=fake.email(), email=fake.email(), password=fake.password())
-        self.user2 = User.objects.create_user(username=fake.email(), email=fake.email(), password=fake.password())
+        username1 = fake.name().split(" ")[0]  # fake.name() return "Name Surname", so I split the string and get "Name"
+        username2 = fake.name().split(" ")[0]
+        self.user1 = User.objects.create_user(username=username1, email=fake.email(), password=fake.password())
+        self.user2 = User.objects.create_user(username=username2, email=fake.email(), password=fake.password())
         board = Board.objects.create(name=fake.word(), description=fake.text())
         topic = Topic.objects.create(name=fake.word(), board=board, owner=self.user1)
         self.post1 = Post.objects.create(message=fake.text(), topic=topic, created_by=self.user1, updated_by=self.user1)
