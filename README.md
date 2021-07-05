@@ -1,54 +1,66 @@
 # Django boards
 ____
-Small instruction for Ubuntu, to start project on your machine:
+Small instruction to start this project on your machine:
 
 ##	What you need:
  
-###	1a) Check availability of docker on your machine:
-```
-	docker --version
-```
-###	1b) If docker not intalled on your machine, download docker:
-####	Step 1: Updating the Local Repository
-
-Open a terminal window and update the local repository with:
-
-```
-	sudo apt update
-```
-
-####	Step 2: Installing Docker
-
-```
-	sudo apt install docker.io
-```
-
-####	Step 3: Checking Docker Installation
+###	1) Check availability of docker on your machine:
 
 ```
 	docker --version
 ```
+If docker not installed on your machine:
 
-####	Step 4: Starting Docker Service 
+Linux:
+https://docs.docker.com/engine/install/#server
 
-```
-	sudo systemctl start docker
-```
+macOS:
+https://docs.docker.com/docker-for-mac/install/
 
-Then, enable it to run at startup:
+Windows 10:
+https://docs.docker.com/docker-for-windows/install/
+____
+###	2) If you have docker on your machine, to start the project:
 
-```
-	sudo systemctl enable docker
-```
-
-To check the status of the service, run:
-
-```
-	sudo systemctl status docker
-```
-###	2) Enter these commands to start the project
 setup:
+
+a) open directory with `docker-compose.yml` and `.env.example` file 
+
+rename `.env.example` to `.env` and enter value for (SECRET_KEY, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, SERVER_PORT) 
+
+b) open terminal/consol/CLI
+
+###	Commands:
+
+to build project and run:
+
 ```
-	docker-compose up
+	docker-compose up --build
 ```
+
+to build project and run in the background:
+```
+	docker-compose up --build -d
+```
+
+to run the built project:
+```
+	docker-compose start
+```
+
+to stop project:
+```
+	docker-compose stop 
+```
+
+to disassemble project:
+```
+	docker-compose down
+```
+
+to disassemble project and delete database:
+```
+	docker-compose down --volume
+```
+____
 Maybe that's all)
