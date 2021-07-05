@@ -3,32 +3,17 @@ ____
 Small instruction to start this project on your machine:
 
 ##	What you need:
- 
-###	1) Check availability of docker on your machine:
-
-```
-	docker --version
-```
-If docker not installed on your machine:
-
-Linux:
-https://docs.docker.com/engine/install/#server
-
-macOS:
-https://docs.docker.com/docker-for-mac/install/
-
-Windows 10:
-https://docs.docker.com/docker-for-windows/install/
+To start project your machine must have docker
 ____
-###	2) If you have docker on your machine, to start the project:
+###	To start the project:
 
 setup:
 
-2.1) open directory with `docker-compose.yml` and `.env.example` file 
+Open directory with `docker-compose.yml` and `.env.example` file 
 
-rename `.env.example` to `.env` and enter value for (SECRET_KEY, DB_NAME, DB_USER, DB_PASSWORD, SERVER_PORT) 
+rename `.env.example` to `.env` and enter value
 
-2.2) open terminal/consol/CLI and write commands:
+Open terminal/consol/CLI and write commands:
 
 ###	Commands:
 
