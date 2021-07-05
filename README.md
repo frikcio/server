@@ -24,11 +24,11 @@ ____
 
 setup:
 
-a) open directory with `docker-compose.yml` and `.env.example` file 
+2.1) open directory with `docker-compose.yml` and `.env.example` file 
 
-rename `.env.example` to `.env` and enter value for (SECRET_KEY, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, SERVER_PORT) 
+rename `.env.example` to `.env` and enter value for (SECRET_KEY, DB_NAME, DB_USER, DB_PASSWORD, SERVER_PORT) 
 
-b) open terminal/consol/CLI
+2.2) open terminal/consol/CLI and write commands:
 
 ###	Commands:
 
