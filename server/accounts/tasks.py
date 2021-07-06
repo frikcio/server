@@ -15,3 +15,10 @@ def send_verification_email(user_pk, absolute_url):
               f'{absolute_url}activate/{uid64}/{token}/' \
               f' to activate your account'
     user.email_user(subject=user, message=message, from_email="develop Team")
+
+
+@shared_task
+def reminder(user_pk):
+    user = get_user_model().objects.get(pk=user_pk)
+    message = f'Hi {user}\n your lunch will be in 5 minutes'
+    user.email_user(subject=user, message=message, from_email="develop Team")

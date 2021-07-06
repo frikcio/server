@@ -1,6 +1,7 @@
 import base64
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -11,7 +12,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 
-from .forms import RegisterForm
+from .forms import RegisterForm, RemindForm
 from .tasks import send_verification_email
 
 
@@ -41,6 +42,11 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     def get_object(self, queryset=None):
         return self.request.user
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['remind_form'] = RemindForm()
+        return context
+
 
 ACCOUNT_VERIFICATION_TOKEN = "_verification_token"
 
@@ -66,6 +72,8 @@ class AccountActivateView(DetailView):
                     self.valid_link = True
                     self.user.is_active = True
                     self.user.save()
+                    readers_group = Group.objects.get(name='readers')
+                    readers_group.user_set.add(self.user)
                     login(self.request, self.user)
                     return HttpResponseRedirect(self.success_url)
             else:
