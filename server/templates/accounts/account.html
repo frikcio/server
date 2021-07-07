@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}My account{% endblock %}
 
 {% block breadcrumb %}
@@ -12,8 +12,16 @@
             <form method="post" novalidate>
                 {% csrf_token %}
                 {% include 'includes/form.html' %}
-                <button type="submit" class="btn btn-success">Save changes</button>
+                <button id="submit" type="submit" class="btn btn-success">Save changes</button>
+            </form>
+            <form id="user_config" method="post" action="{% url 'account_config' request.user.pk %}">
+                {% csrf_token %}
+                {{ config_form }}
             </form>
         </div>
     </div>
+{% endblock %}
+
+{% block javascript %}
+    {% include 'includes/dj_ajax.html' %}
 {% endblock %}
