@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 from django import forms
+from django.test import TestCase
 
 from boards.templatetags.form_tags import field_type, input_class
 

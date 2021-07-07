@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}My account{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">My account</li>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-6 col-md-8 col-sm-10">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% include 'includes/form.html' %}
+                <button id="submit" type="submit" class="btn btn-success">Save changes</button>
+            </form>
+            <form id="user_config" method="post" action="{% url 'account_config' request.user.pk %}">
+                {% csrf_token %}
+                {{ config_form }}
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    {% include 'includes/dj_ajax.html' %}
+{% endblock %}

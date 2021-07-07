@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
 
-from accounts.models import RemindAccess
+from .models import Config
 
 
 class RegisterForm(UserCreationForm):
@@ -14,7 +14,7 @@ class RegisterForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2']
 
 
-class RemindForm(ModelForm):
+class UserConfigForm(forms.ModelForm):
     class Meta:
-        model = RemindAccess
-        fields = ['remind']
+        model = Config
+        fields = ['send_reminder_email']

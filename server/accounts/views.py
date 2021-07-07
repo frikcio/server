@@ -1,22 +1,38 @@
 import base64
 
+from django.contrib.auth import login, get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import Group
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView, DetailView
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth import login, get_user_model
-from django.utils.decorators import method_decorator
+from django.db import transaction
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
+from django.views.generic import CreateView, UpdateView, DetailView
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 
-from .forms import RegisterForm, RemindForm
+from .forms import RegisterForm, UserConfigForm
+from .models import Config
 from .tasks import send_verification_email
 
-
+# get auth user model from settings
 User = get_user_model()
+
+
+def user_config(request, user_pk):
+    if request.POST:
+        print(request.POST.get("send_reminder_email"))
+        remind_status = request.POST.get("send_reminder_email")
+        queryset = Config.objects.filter(user__pk=user_pk)
+        user_config = get_object_or_404(queryset, user__pk=user_pk)
+        user_config.send_reminder_email = True if remind_status == 'true' else False
+        user_config.save()
+        print(request.user.config.send_reminder_email)
+        return HttpResponse("Changed", status=200)
+    else:
+        return HttpResponseRedirect(reverse_lazy('account'))
 
 
 class RegisterView(CreateView):
@@ -27,7 +43,9 @@ class RegisterView(CreateView):
         # if form valid, save user and give send_verification_email to celery
         user = form.save(commit=False)
         user.is_active = False
-        user.save()
+        with transaction.atomic():
+            user.save()
+            Config.objects.create(user=user)
         absolute_url = self.request.build_absolute_uri('/')
         send_verification_email.delay(user.pk, absolute_url)
         return redirect('home')
@@ -36,15 +54,17 @@ class RegisterView(CreateView):
 class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     fields = ('first_name', 'last_name')
-    template_name = 'accounts/profile.html'
-    success_url = reverse_lazy('profile')
+    template_name = 'accounts/account.html'
+    success_url = reverse_lazy('account')
 
     def get_object(self, queryset=None):
         return self.request.user
 
     def get_context_data(self, **kwargs):
+        config_form = UserConfigForm(self.request.POST or None,
+                                     instance=Config.objects.get(user__pk=self.request.user.pk))
         context = super().get_context_data()
-        context['remind_form'] = RemindForm()
+        context['config_form'] = config_form
         return context
 
 
@@ -55,12 +75,12 @@ class AccountActivateView(DetailView):
     activate_ulr_token = 'activate_user'
     token_generator = default_token_generator
     template_name = 'accounts/register.html'
-    success_url = reverse_lazy('profile')
+    success_url = reverse_lazy('account')
 
     @method_decorator(sensitive_post_parameters())
     @method_decorator(never_cache)
     def dispatch(self, *args, **kwargs):
-        #   check link if True - activate user and redirect on user's profile page,
+        #   check link if True - activate user and redirect on user's account page,
         #   if False - display message that link is not valid
         self.valid_link = False
         self.user = self.get_user()

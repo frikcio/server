@@ -1,0 +1,16 @@
+{% load static %}
+<script>
+    window.CSRF_TOKEN = "{{ csrf_token }}"
+    elem = document.getElementById('id_send_reminder_email')
+    elem.onchange = function (){
+        console.log('hey')
+        $.ajax({
+            type: "POST",
+            credential: 'include',
+            url: '{% url 'account_config' request.user.pk %}',
+            data: {csrfmiddlewaretoken: window.CSRF_TOKEN,
+                'send_reminder_email': document.getElementById('id_send_reminder_email').checked
+            }
+        })
+    }
+</script>
