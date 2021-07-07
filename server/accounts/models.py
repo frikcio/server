@@ -17,4 +17,4 @@ class User(AbstractUser):
 
 class Config(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='config')
-    send_reminder_email = models.BooleanField(default=False, blank=True, null=True)
+    send_reminder_email = models.BooleanField(default=False)
