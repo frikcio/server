@@ -4,8 +4,8 @@ from django.contrib.auth import login, get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.db import transaction
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import CreateView, UpdateView, DetailView
@@ -20,6 +20,20 @@ from .tasks import send_verification_email
 User = get_user_model()
 
 
+def user_config(request, user_pk):
+    if request.POST:
+        print(request.POST.get("send_reminder_email"))
+        remind_status = request.POST.get("send_reminder_email")
+        queryset = Config.objects.filter(user__pk=user_pk)
+        user_config = get_object_or_404(queryset, user__pk=user_pk)
+        user_config.send_reminder_email = True if remind_status == 'true' else False
+        user_config.save()
+        print(request.user.config.send_reminder_email)
+        return HttpResponse("Changed", status=200)
+    else:
+        return HttpResponseRedirect(reverse_lazy('account'))
+
+
 class RegisterView(CreateView):
     form_class = RegisterForm
     template_name = 'accounts/register.html'
@@ -29,8 +43,8 @@ class RegisterView(CreateView):
         user = form.save(commit=False)
         user.is_active = False
         with transaction.atomic():
-            Config.objects.create(user=user)
             user.save()
+            Config.objects.create(user=user)
         absolute_url = self.request.build_absolute_uri('/')
         send_verification_email.delay(user.pk, absolute_url)
         return redirect('home')
@@ -46,8 +60,10 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def get_context_data(self, **kwargs):
+        config_form = UserConfigForm(self.request.POST or None,
+                                     instance=Config.objects.get(user__pk=self.request.user.pk))
         context = super().get_context_data()
-        context['config_form'] = UserConfigForm()
+        context['config_form'] = config_form
         return context
 
 
