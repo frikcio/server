@@ -1,6 +1,6 @@
 from django import forms
 
-from boards.models import Topic, Post
+from .models import Topic, Post
 
 
 class NewTopicForm(forms.ModelForm):

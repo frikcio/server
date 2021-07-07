@@ -1,15 +1,15 @@
 import base64
 
+from django.contrib.auth import login, get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView, DetailView
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth import login, get_user_model
-from django.utils.decorators import method_decorator
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
+from django.views.generic import CreateView, UpdateView, DetailView
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 
 from .forms import RegisterForm
 from .tasks import send_verification_email

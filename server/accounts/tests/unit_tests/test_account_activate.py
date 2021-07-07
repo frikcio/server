@@ -1,12 +1,12 @@
-import os
 import base64
+import os
 
 from faker import Factory
 
-from django.test import TestCase, RequestFactory
-from django.urls import reverse
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
+from django.test import TestCase, RequestFactory
+from django.urls import reverse
 
 from accounts.views import AccountActivateView
 
