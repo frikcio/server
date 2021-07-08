@@ -17,7 +17,6 @@ from .forms import RegisterForm, UserConfigForm
 from .models import Config
 from .tasks import send_verification_email
 
-# get auth user model from settings
 User = get_user_model()
 
 
