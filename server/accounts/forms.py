@@ -1,9 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
-from django.forms import ModelForm
 
-from .models import Config
+from .models import Settings
 
 
 class RegisterForm(UserCreationForm):
@@ -14,7 +13,7 @@ class RegisterForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2']
 
 
-class UserConfigForm(forms.ModelForm):
+class PeriodicMailingForm(forms.ModelForm):
     class Meta:
-        model = Config
-        fields = ['send_reminder_email']
+        model = Settings
+        fields = ['periodic_mailing']

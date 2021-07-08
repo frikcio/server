@@ -14,6 +14,6 @@ class User(AbstractUser):
         return int((timezone.now().date() - self.birth_date).year)
 
 
-class Config(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='config')
-    send_reminder_email = models.BooleanField(default=False)
+class Settings(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='settings')
+    periodic_mailing = models.BooleanField(default=False)

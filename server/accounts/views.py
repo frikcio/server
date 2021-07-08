@@ -13,20 +13,20 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import CreateView, UpdateView, DetailView
 
-from .forms import RegisterForm, UserConfigForm
-from .models import Config
+from .forms import RegisterForm, PeriodicMailingForm
+from .models import Settings
 from .tasks import send_verification_email
 
 User = get_user_model()
 
 
-def user_config(request, user_pk):
+def change_mailing_status(request, user_pk):
     if request.POST:
-        remind_status = request.POST.get("send_reminder_email")
-        user_config = get_object_or_404(Config, user__pk=user_pk)
-        user_config.send_reminder_email = True if remind_status == 'true' else False
-        user_config.save()
-        return HttpResponse("Parameter has changed", status=202)
+        mailing_status = request.POST.get('mailing_status')
+        user_settings = get_object_or_404(Settings, user__pk=user_pk)
+        user_settings.periodic_mailing = True if mailing_status == 'true' else False
+        user_settings.save()
+        return HttpResponse("Parameter changed", status=202)
     else:
         return HttpResponseRedirect(reverse_lazy('account'))
 
@@ -41,7 +41,7 @@ class RegisterView(CreateView):
         user.is_active = False
         with transaction.atomic():
             user.save()
-            Config.objects.create(user=user)
+            Settings.objects.create(user=user)
         absolute_url = self.request.build_absolute_uri('/')
         send_verification_email.delay(user.pk, absolute_url)
         return redirect('home')
@@ -57,10 +57,9 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def get_context_data(self, **kwargs):
-        config_form = UserConfigForm(self.request.POST or None,
-                                     instance=Config.objects.get(user__pk=self.request.user.pk))
         context = super().get_context_data()
-        context['config_form'] = config_form
+        context['mailing_form'] = PeriodicMailingForm(self.request.POST or None,
+                                     instance=get_object_or_404(Settings, user__pk=self.request.user.pk))
         return context
 
 
