@@ -11,11 +11,18 @@ setup:
 
 Open directory with `docker-compose.yml` and `.env.example` file 
 
-rename `.env.example` to `.env` and enter value
+copy `.env.example` as `.env` and enter value
 
 Open terminal/consol/CLI and write commands:
 
 ###	Commands:
+
+run this command for create tables in database:
+ 
+```
+	docker-compose run server python manage.py migrate
+```
+
 
 to build project and run:
 
