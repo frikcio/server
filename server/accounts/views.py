@@ -23,8 +23,7 @@ User = get_user_model()
 def user_config(request, user_pk):
     if request.POST:
         remind_status = request.POST.get("send_reminder_email")
-        queryset = Config.objects.filter(user__pk=user_pk)
-        user_config = get_object_or_404(queryset, user__pk=user_pk)
+        user_config = get_object_or_404(Config, user__pk=user_pk)
         user_config.send_reminder_email = True if remind_status == 'true' else False
         user_config.save()
         return HttpResponse("Changed", status=200)
