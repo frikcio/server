@@ -14,14 +14,14 @@
                 {% include 'includes/form.html' %}
                 <button id="submit" type="submit" class="btn btn-success">Save changes</button>
             </form>
-            <form id="user_config" method="post" action="{% url 'account_config' request.user.pk %}">
+            <form method="post">
                 {% csrf_token %}
-                {{ config_form }}
+                {{ mailing_form }}
             </form>
         </div>
     </div>
 {% endblock %}
 
 {% block javascript %}
-    {% include 'includes/dj_ajax.html' %}
+    {% include 'includes/change_mailing_status.html' %}
 {% endblock %}

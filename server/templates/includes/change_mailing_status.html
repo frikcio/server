@@ -7,9 +7,9 @@
         $.ajax({
             type: "POST",
             credential: 'include',
-            url: '{% url 'account_settings' request.user.pk "true" %}',
+            url: '{% url 'account_settings' request.user.pk %}',
             data: {csrfmiddlewaretoken: window.CSRF_TOKEN,
-                'periodic_mailing': document.getElementById('id_periodic_mailing').checked
+                'mailing_status': document.getElementById('id_periodic_mailing').checked
             }
         })
     }
