@@ -1,17 +1,17 @@
 import base64
 
 from django.contrib.auth import login, get_user_model
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import Group
-from django.contrib.auth.tokens import default_token_generator
 from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import CreateView, UpdateView, DetailView
-from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
 
 from .forms import RegisterForm, UserConfigForm
 from .models import Config
