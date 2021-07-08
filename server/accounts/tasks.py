@@ -6,9 +6,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 
 
+User = get_user_model()
+
+
 @shared_task
 def send_verification_email(user_pk, absolute_url):
-    user = get_user_model().objects.get(pk=user_pk)
+    user = User.objects.get(pk=user_pk)
     token = default_token_generator.make_token(user)
     uid64 = base64.urlsafe_b64encode(str(user.pk).encode()).decode()
     message = f'Hi {user}\n you just register in our site\n To continue registration please follow: \n' \
@@ -18,7 +21,7 @@ def send_verification_email(user_pk, absolute_url):
 
 
 @shared_task
-def reminder(user_pk):
-    user = get_user_model().objects.get(pk=user_pk)
-    message = f'Hi {user}\n your lunch will be in 5 minutes'
-    user.email_user(subject=user, message=message, from_email="develop Team")
+def send_reminder_email():
+    for user in User.objects.filter(config__send_reminder_email=True):
+        message = f'Hi {user}\n your lunch will be in 5 minutes'
+        user.email_user(subject=user, message=message, from_email="develop Team")
