@@ -18,7 +18,7 @@ services:
   server:
     build: server/
     container_name: boards_server
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:${SERVER_PORT}"
+    command: python manage.py runserver 0.0.0.0:${SERVER_PORT}
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     volumes:
