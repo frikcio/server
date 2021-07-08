@@ -9,6 +9,9 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, blank=False, null=False)
     birth_date = models.DateField(blank=True, null=True)
 
+    def __str__(self):
+        return self.username
+
     @property
     def age(self):
         return int((timezone.now().date() - self.birth_date).year)
@@ -17,3 +20,6 @@ class User(AbstractUser):
 class Settings(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='settings')
     periodic_mailing = models.BooleanField(default=False)
+
+    def __str__(self):
+        return ".periodic_mailing"
