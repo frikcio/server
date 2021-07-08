@@ -3,7 +3,6 @@ import os
 from celery import Celery
 from celery.schedules import crontab
 
-from accounts.tasks import reminder
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.settings')
 app = Celery('server')
@@ -12,9 +11,10 @@ app.autodiscover_tasks()
 
 
 app.conf.beat_schedule = {
-    'reminder': {
-        'task': 'accounts.tasks.reminder',
-        'schedule': crontab(hour=14, day_of_week='1,2,3,4,5')
+    'send_reminder_email': {
+        'task': 'accounts.tasks.send_reminder_email',
+        'schedule': crontab(hour=11, day_of_week='1,2,3,4,5')
 
     }
 }
+app.conf.timezone = 'Europe/Kiev'
