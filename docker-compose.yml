@@ -57,6 +57,21 @@ services:
       - redis
     restart: always
   
+  celery-beat:
+    build: server/
+    env_file:
+      - .env
+    container_name: boards_celery_beat
+    command: celery -A server beat -s /home/celerybeat-schedule
+    volumes:
+      - ./server/:/home/server
+    networks:
+      - server_net
+    depends_on:
+      - server
+      - redis
+    restart: always
+  
 volumes:
   db:
 networks:
