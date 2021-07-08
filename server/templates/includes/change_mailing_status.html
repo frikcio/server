@@ -1,16 +1,14 @@
 {% load static %}
 <script>
     window.CSRF_TOKEN = "{{ csrf_token }}"
-    send_reminder_email_flag = document.getElementById('id_periodic_mailing')
-    send_reminder_email_flag.onchange = function (){
-        console.log(document.getElementById('id_periodic_mailing').checked)
+    $('#id_periodic_mailing').on('change', function (){
         $.ajax({
             type: "POST",
             credential: 'include',
             url: '{% url 'account_settings' request.user.pk %}',
             data: {csrfmiddlewaretoken: window.CSRF_TOKEN,
-                'mailing_status': document.getElementById('id_periodic_mailing').checked
+                'mailing_status': $('#id_periodic_mailing').is(':checked')
             }
         })
-    }
+    })
 </script>
