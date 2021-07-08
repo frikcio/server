@@ -22,13 +22,11 @@ User = get_user_model()
 
 def user_config(request, user_pk):
     if request.POST:
-        print(request.POST.get("send_reminder_email"))
         remind_status = request.POST.get("send_reminder_email")
         queryset = Config.objects.filter(user__pk=user_pk)
         user_config = get_object_or_404(queryset, user__pk=user_pk)
         user_config.send_reminder_email = True if remind_status == 'true' else False
         user_config.save()
-        print(request.user.config.send_reminder_email)
         return HttpResponse("Changed", status=200)
     else:
         return HttpResponseRedirect(reverse_lazy('account'))
