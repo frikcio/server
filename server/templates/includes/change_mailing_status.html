@@ -3,11 +3,10 @@
     window.CSRF_TOKEN = "{{ csrf_token }}"
     $('#id_periodic_mailing').on('change', function (){
         $.ajax({
+            url: '{% url 'account_settings' request.user.pk %}?' + $.param({'status': $('#id_periodic_mailing').is(':checked')}),
             type: "POST",
             credential: 'include',
-            url: '{% url 'account_settings' request.user.pk %}',
             data: {csrfmiddlewaretoken: window.CSRF_TOKEN,
-                'mailing_status': $('#id_periodic_mailing').is(':checked')
             }
         })
     })
