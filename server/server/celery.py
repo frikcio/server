@@ -12,8 +12,8 @@ app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
     'send_reminder_email': {
-        'task': 'accounts.tasks.send_reminder_email',
-        'schedule': crontab(hour=11, day_of_week='1,2,3,4,5')
+        'task': 'accounts.tasks.mailing',
+        'schedule': crontab(hour=14, day_of_week='1,2,3,4,5')
 
     }
 }
