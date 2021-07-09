@@ -9,8 +9,9 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, UpdateView, DetailView
 
 from .forms import RegisterForm, SettingsForm
@@ -20,6 +21,7 @@ from .tasks import send_verification_email
 User = get_user_model()
 
 
+@require_http_methods(["POST"])
 def change_mailing_status(request, user_pk):
     if request.POST:
         mailing_status = request.POST.get('mailing_status')
@@ -27,8 +29,6 @@ def change_mailing_status(request, user_pk):
         user_settings.periodic_mailing = True if mailing_status == 'true' else False
         user_settings.save()
         return HttpResponse("Parameter changed", status=202)
-    else:
-        return HttpResponseRedirect(reverse_lazy('account'))
 
 
 class RegisterView(CreateView):
