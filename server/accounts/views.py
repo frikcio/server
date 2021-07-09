@@ -36,7 +36,7 @@ class RegisterView(CreateView):
     template_name = 'accounts/register.html'
 
     def form_valid(self, form):
-        # if form valid, save user and give send_verification_email to celery
+        # Save user and send_verification_email with celery help
         user = form.save(commit=False)
         user.is_active = False
         with transaction.atomic():
@@ -57,6 +57,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def get_context_data(self, **kwargs):
+        # Append second form on template
         context = super().get_context_data()
         context['mailing_form'] = SettingsForm(self.request.POST or None,
                                      instance=get_object_or_404(Settings, user__pk=self.request.user.pk))
@@ -75,8 +76,8 @@ class AccountActivateView(DetailView):
     @method_decorator(sensitive_post_parameters())
     @method_decorator(never_cache)
     def dispatch(self, *args, **kwargs):
-        #   check link if True - activate user and redirect on user's account page,
-        #   if False - display message that link is not valid
+        # Activate user and redirect on user's account page, if link not used
+        # Display message that link is not valid if link was used
         self.valid_link = False
         self.user = self.get_user()
         if self.user is not None:
@@ -99,7 +100,7 @@ class AccountActivateView(DetailView):
         return self.render_to_response(self.get_context_data())
 
     def get_user(self):
-        #   return user if user has exist and None if not
+        # Return user if user has exist and None if not
         try:
             user_pk = base64.urlsafe_b64decode(self.kwargs['uid64']).decode()
             user = User.objects.get(pk=user_pk)
@@ -108,7 +109,7 @@ class AccountActivateView(DetailView):
         return user
 
     def get_context_data(self, **kwargs):
-        #   if all alright - add "valid_link=True" to template, else - "valid_link=False" and "form=None"
+        # Append values to template if link was used
         self.object = self.get_user()
         context = super().get_context_data(**kwargs)
         if not self.valid_link:

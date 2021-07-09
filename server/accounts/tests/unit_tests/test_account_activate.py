@@ -34,26 +34,26 @@ class AccountActivateViewTests(TestCase):
         self.view.kwargs.update(kwargs)
 
     def test_get_user_success(self):
-        #   get user if get correctly uid64 or token
+        # Get user if get correctly uid64 or token
         url_user = self.view.get_user()
         db_user = User.objects.first()
         self.assertEquals(url_user, db_user)
 
     def test_get_user_fail(self):
-        #   get None if get wrong uid64 or token
+        # Get None if get wrong uid64 or token
         self.view.kwargs['uid64'] = 'MktR=='
         url_user = self.view.get_user()
         self.assertIsNone(url_user)
 
     def test_get_context_data_if_link_is_not_valid(self):
-        #   if link is not valid get "title" and "valid_link=False" at the template
+        # Get values at the template if link is not valid 
         self.view.valid_link = False
         context = self.view.get_context_data()
         self.assertEqual(context["valid_link"], False)
         self.assertIn("title", context)
 
     def test_user_is_active(self):
-        #   if transfer correct data, user is began active
+        # Activate user if he sent correct data, 
         session = self.client.session
         session["_verification_token"] = self.token
         session.save()
@@ -62,7 +62,7 @@ class AccountActivateViewTests(TestCase):
         self.assertTrue(user.is_active)
 
     def test_user_is_not_active(self):
-        #   if transfer wrong data, user is still not active
+        # Not activete user if sent wrong data 
         session = self.client.session
         session["_verification_token"] = "Some-Wrong_token"
         session.save()

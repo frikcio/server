@@ -29,13 +29,13 @@ class TestsPostUpdateView(TestCase):
         self.view.setup(request=request)
 
     def test_get_filter_queryset(self):
-        #   get queryset with post with post1 and without post2
+        # Get queryset with post with post1 and without post2
         queryset = self.view.get_queryset()
         self.assertIn(self.post1, queryset)
         self.assertNotIn(self.post2, queryset)
 
     def test_post_updated_by_owner(self):
-        #   if request sends by post's user, update post's  message, updated_at and updated_by
+        # Update message, updated_at and updated_by if request sends by post's owner
         self.client.force_login(user=self.user1)
         self.client.post(self.url, data={"message": fake.text()})
         not_updated_post = self.post1
@@ -45,7 +45,7 @@ class TestsPostUpdateView(TestCase):
         self.assertNotEqual(not_updated_post.message, updated_post.message)
 
     def test_post_updated_by_not_owner(self):
-        #    if request sends not by post's user, update nothing
+        # Update nothing ff request sends by not post's owner
         self.client.force_login(user=self.user2)
         self.client.post(self.url, data={"message": fake.text()})
         not_updated_post = self.post1
