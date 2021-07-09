@@ -23,12 +23,11 @@ User = get_user_model()
 
 @require_http_methods(["POST"])
 def change_mailing_status(request, user_pk):
-    if request.POST:
-        mailing_status = request.POST.get('mailing_status')
-        user_settings = get_object_or_404(Settings, user__pk=user_pk)
-        user_settings.periodic_mailing = True if mailing_status == 'true' else False
-        user_settings.save()
-        return HttpResponse("Parameter changed", status=202)
+    mailing_status = request.META['QUERY_STRING'].split('=')[1]
+    user_settings = get_object_or_404(Settings, user__pk=user_pk)
+    user_settings.periodic_mailing = True if mailing_status == 'true' else False
+    user_settings.save()
+    return HttpResponse("Parameter changed", status=202)
 
 
 class RegisterView(CreateView):
