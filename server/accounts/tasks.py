@@ -23,11 +23,12 @@ def send_verification_email(user_pk, absolute_url):
 
 
 @shared_task
-def mailing():
-    # send reminder email only for users with config.send_reminder_email = True
-    messages = []
-    for user in User.objects.filter(settings__periodic_mailing=True):
-        message = f'Hi {user}\n your lunch will be in 5 minutes'
-        msg = (user, message, "develop@team.com", [user.email])
-        messages.append(msg)
-    send_mass_mail(messages, fail_silently=False)
+def email_distribution():
+    # send emails only for willing users
+    recipients = User.objects.filter(settings__periodic_mailing=True)
+    emails = []
+    for user in recipients:
+        message = f'Hi {user}\n you get this email because you accept periodic mailing'
+        email_data = (user, message, "develop@team.com", [user.email])
+        emails.append(email_data)
+    send_mass_mail(emails, fail_silently=True)
