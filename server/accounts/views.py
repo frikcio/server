@@ -13,7 +13,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import CreateView, UpdateView, DetailView
 
-from .forms import RegisterForm, PeriodicMailingForm
+from .forms import RegisterForm, SettingsForm
 from .models import Settings
 from .tasks import send_verification_email
 
@@ -58,7 +58,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['mailing_form'] = PeriodicMailingForm(self.request.POST or None,
+        context['mailing_form'] = SettingsForm(self.request.POST or None,
                                      instance=get_object_or_404(Settings, user__pk=self.request.user.pk))
         return context
 

@@ -13,7 +13,7 @@ class RegisterForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2']
 
 
-class PeriodicMailingForm(forms.ModelForm):
+class SettingsForm(forms.ModelForm):
     class Meta:
         model = Settings
         fields = ['periodic_mailing']
