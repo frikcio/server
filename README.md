@@ -23,6 +23,11 @@ run this command for create tables in database:
 	docker-compose run server python manage.py migrate
 ```
 
+for create superuser:
+
+```
+	docker-compose run server python manage.py createsuperuser
+```
 
 to build project and run:
 
@@ -40,7 +45,7 @@ to run the built project:
 	docker-compose start
 ```
 
-to stop project:
+if project runs in the background, to stop project:
 ```
 	docker-compose stop 
 ```
@@ -54,5 +59,3 @@ to disassemble project and delete database:
 ```
 	docker-compose down --volume
 ```
-____
-Maybe that's all)
