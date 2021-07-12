@@ -23,9 +23,10 @@ User = get_user_model()
 
 @require_http_methods(["POST"])
 def change_mailing_status(request, user_pk):
-    mailing_status = request.META['QUERY_STRING'].split('=')[1]
-    user_settings = get_object_or_404(Settings, user__pk=user_pk)
-    user_settings.periodic_mailing = True if mailing_status == 'true' else False
+    # get new mailing status from request, and change user's periodic mailing 
+    new_mailing_status = request.META['QUERY_STRING'].split('=')[1]  # get new mailing status from query string
+    user_settings = get_object_or_404(Settings, user__pk=user_pk)  # get user's settings
+    user_settings.periodic_mailing = True if new_mailing_status == 'true' else False
     user_settings.save()
     return HttpResponse("Parameter changed", status=202)
 
@@ -59,7 +60,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         # Append second form on template
         context = super().get_context_data()
         context['mailing_form'] = SettingsForm(self.request.POST or None,
-                                     instance=get_object_or_404(Settings, user__pk=self.request.user.pk))
+                                               instance=get_object_or_404(Settings, user__pk=self.request.user.pk))
         return context
 
 
