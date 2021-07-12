@@ -3,7 +3,7 @@ from django.contrib.auth.models import Group
 from django.db import migrations
 
 
-def create_groups(apps, schema_editor):  #заменить 
+def create_groups(apps, schema_editor):
     # Create users groups for server
     Group.objects.bulk_create([
         Group(name='readers'),
