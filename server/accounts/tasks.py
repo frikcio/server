@@ -23,7 +23,7 @@ def send_verification_email(user_pk, absolute_url):
 
 
 @shared_task
-def email_distribution():
+def distribute_emails():
     # send emails only for willing users
     recipients = User.objects.filter(settings__periodic_mailing=True)
     emails = []
