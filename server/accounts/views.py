@@ -49,7 +49,7 @@ class RegisterView(CreateView):
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
-    fields = ('first_name', 'last_name')
+    fields = ('first_name', 'last_name', 'gender',)
     template_name = 'accounts/account.html'
     success_url = reverse_lazy('account')
 
