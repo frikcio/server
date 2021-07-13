@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load avatar_tags %}
+
 {% block title %}My account{% endblock %}
 
 {% block breadcrumb %}
@@ -9,6 +11,8 @@
 {% block content %}
     <div class="row">
         <div class="col-lg-6 col-md-8 col-sm-10">
+            {% avatar user 100 %}
+            <a href="{% url 'avatar_change' %}">Change your avatar</a>
             <form method="post" novalidate>
                 {% csrf_token %}
                 {% include 'includes/form.html' %}
