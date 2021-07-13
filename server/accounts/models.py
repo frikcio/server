@@ -3,17 +3,17 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
-GENDER_CHOISES = (
+GENDER_CHOICES = (
     (1, ("Not selected")),
     (2, ("man")),
     (3, ("woman")),
-    )
+)
+
 
 class User(AbstractUser):
-    avatar = models.ImageField(blank=True, null=True)
     email = models.EmailField(unique=True, blank=False, null=False)
     birth_date = models.DateField(blank=True, null=True)
-    gender = models.IntegerField(choices=GENDER_CHOISES, default=1)
+    gender = models.IntegerField(choices=GENDER_CHOICES, default=1)
 
     def __str__(self):
         return self.username
