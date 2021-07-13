@@ -39,8 +39,10 @@ class RegisterView(CreateView):
         # Save user and send_verification_email with celery help
         user = form.save(commit=False)
         user.is_active = False
+        group = Group.objects.get(pk=form.cleaned_data['groups'])
         with transaction.atomic():
             user.save()
+            user.groups.add(group)
             Settings.objects.create(user=user)
         absolute_url = self.request.build_absolute_uri('/')
         send_verification_email.delay(user.pk, absolute_url)
@@ -88,8 +90,6 @@ class AccountActivateView(DetailView):
                     self.valid_link = True
                     self.user.is_active = True
                     self.user.save()
-                    readers_group = Group.objects.get(name='readers')
-                    readers_group.user_set.add(self.user)
                     login(self.request, self.user)
                     return HttpResponseRedirect(self.success_url)
             else:
