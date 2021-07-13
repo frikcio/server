@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db import transaction
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
@@ -10,7 +10,8 @@ from .models import Board, Topic, Post
 from .forms import NewTopicForm, PostForm
 
 
-class NewBoardView(LoginRequiredMixin, CreateView):
+class NewBoardView(PermissionRequiredMixin, CreateView):
+    permission_required = 'boards.add_board'
     model = Board
     template_name = 'board/new_board.html'
     fields = ('name', 'description')
@@ -43,7 +44,8 @@ class TopicListView(ListView):
         return queryset
 
 
-class NewTopicView(LoginRequiredMixin, CreateView):
+class NewTopicView(PermissionRequiredMixin, CreateView):
+    permission_required = 'boards.add_topic'
     form_class = NewTopicForm
     template_name = 'board/new_topic.html'
     pk_url_kwarg = 'board_pk'
@@ -72,7 +74,7 @@ class PostListView(ListView):
     model = Post
     context_object_name = 'posts'
     template_name = 'board/topic_posts.html'
-    paginate_by = 2
+    paginate_by = 4
 
     def get_context_data(self, **kwargs):
         # Update topic's view, when template rendering and append new value to topic_posts template
@@ -91,7 +93,8 @@ class PostListView(ListView):
         return queryset
 
 
-class ReplyTopicView(LoginRequiredMixin, CreateView):
+class ReplyTopicView(PermissionRequiredMixin, CreateView):
+    permission_required = 'boards.add_post'
     form_class = PostForm
     template_name = 'board/reply_topic.html'
     pk_url_kwarg = 'board_pk'
@@ -116,7 +119,8 @@ class ReplyTopicView(LoginRequiredMixin, CreateView):
         return super().get_context_data(**kwargs)
 
 
-class PostUpdateView(LoginRequiredMixin, UpdateView):
+class PostUpdateView(PermissionRequiredMixin, UpdateView):
+    permission_required = 'boards.update_post'
     login_url = '/login/'
     model = Post
     fields = ('message',)
