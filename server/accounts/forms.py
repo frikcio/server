@@ -6,7 +6,10 @@ from django.contrib.auth.models import Group
 from .models import Settings
 
 
+# Get qoups queryset
 groups_list = Group.objects.all()
+
+# Creating CHOICES, depend on groups count
 GROUP_CHOICES = ([(group.pk, group) for group in groups_list])
 
 
