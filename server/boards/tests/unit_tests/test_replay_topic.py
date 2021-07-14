@@ -1,22 +1,27 @@
 from faker import Factory
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.shortcuts import get_object_or_404
 from django.test import TestCase
 from django.urls import reverse
 
+from accounts.factories import UserFactory, GroupPermissions
+from boards.factories import BoardFactory, TopicFactory
 from boards.models import Board, Topic, Post
-
-User = get_user_model()
 
 fake = Factory.create()
 
 
 class ReplyTopicTests(TestCase):
     def setUp(self):
-        username = fake.name().split(" ")[0]  # fake.name() return "Name Surname", so I split the string and get "Name"
-        user = User.objects.create(username=username, email=fake.email(), password=fake.password())
-        board = Board.objects.create(name=fake.word(), description=fake.text())
-        self.topic = Topic.objects.create(name=fake.word(), board=board, owner=user)
+        user = UserFactory()
+        board = BoardFactory()
+        readers_group = get_object_or_404(Group, name='readers')
+        writers_group = get_object_or_404(Group, name='writers')
+        GroupPermissions.add_writers_permissions(writers_group)
+        GroupPermissions.add_readers_permissions(readers_group)
+        user.groups.add(readers_group)
+        self.topic = TopicFactory(board=board, owner=user)
         self.client.force_login(user=user)
         self.url = reverse("reply_topic", kwargs={"board_pk": board.pk, "topic_pk": self.topic.pk})
 
