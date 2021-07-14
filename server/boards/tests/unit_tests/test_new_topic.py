@@ -1,23 +1,28 @@
 from faker import Factory
+import factory
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.shortcuts import get_object_or_404
 from django.test import TestCase
 from django.urls import reverse
 
-from boards.models import Board, Topic, Post
+from accounts.factories import UserFactory, GroupPermissions
+from boards.factories import BoardFactory
+from boards.models import Topic, Post
 
-User = get_user_model()
 
 fake = Factory.create()
 
-
 class TestNewTopic(TestCase):
     def setUp(self):
-        username = fake.name().split(" ")[0]  # fake.name() return "Name Surname", so I split the string and get "Name"
-        self.board = Board.objects.create(name=fake.word(), description=fake.text())
-        user = User.objects.create_user(username=username, email=fake.email(), password=fake.password())
+        self.board = BoardFactory()
+        user = UserFactory()
+        readers_group = get_object_or_404(Group, name='readers')
+        writers_group = get_object_or_404(Group, name='writers')
+        GroupPermissions.add_writers_permissions(writers_group)
+        user.groups.add(writers_group)
         self.client.force_login(user=user)
-        self.data = {"name": fake.word(), "message": fake.text()}
+        self.data = {'name': fake.word(), 'message': fake.text()}
         self.url = reverse("new_topic", kwargs={"board_pk": self.board.pk})
 
     def test_get_context_data(self):
