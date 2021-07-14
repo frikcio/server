@@ -1,28 +1,22 @@
 import base64
 import os
 
-from faker import Factory
-
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.models import Group
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
+from accounts.factories import UserFactory
 from accounts.views import AccountActivateView
-
-
-fake = Factory.create()
 
 User = get_user_model()
 
 
 class AccountActivateViewTests(TestCase):
     def setUp(self):
-        username = fake.name().split(" ")[0]  # fake.name() return "Name Surname", so I split the string and get "Name"
-        self.user = User.objects.create_user(username=username,
-                                             email=fake.email(),
-                                             password=fake.password(),
-                                             is_active=False)
+        self.user = UserFactory(is_active=False)
+        self.user.groups.add(Group.objects.first())
         self.token = default_token_generator.make_token(self.user)
         uid64 = base64.urlsafe_b64encode(str(self.user.pk).encode()).decode()
         kwargs = {"uid64": uid64, "token": self.token}
@@ -62,7 +56,7 @@ class AccountActivateViewTests(TestCase):
         self.assertTrue(user.is_active)
 
     def test_user_is_not_active(self):
-        # Not activete user if sent wrong data 
+        # Not activate user if sent wrong data
         session = self.client.session
         session["_verification_token"] = "Some-Wrong_token"
         session.save()
