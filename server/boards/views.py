@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db import transaction
 from django.db.models import Count
@@ -23,14 +24,14 @@ class BoardListView(ListView):
     model = Board
     context_object_name = 'boards'
     template_name = 'board/home.html'
-    paginate_by = 5
+    paginate_by = settings.PAGINATION_COUNT
 
 
 class TopicListView(ListView):
     model = Topic
     context_object_name = 'topics'
     template_name = 'board/board_topics.html'
-    paginate_by = 20
+    paginate_by = settings.PAGINATION_COUNT
 
     def get_context_data(self, **kwargs):
         # Append new value to board_topics template
@@ -74,7 +75,7 @@ class PostListView(ListView):
     model = Post
     context_object_name = 'posts'
     template_name = 'board/topic_posts.html'
-    paginate_by = 4
+    paginate_by = settings.PAGINATION_COUNT
 
     def get_context_data(self, **kwargs):
         # Update topic's view, when template rendering and append new value to topic_posts template
@@ -120,7 +121,7 @@ class ReplyTopicView(PermissionRequiredMixin, CreateView):
 
 
 class PostUpdateView(PermissionRequiredMixin, UpdateView):
-    permission_required = 'boards.update_post'
+    permission_required = 'boards.change_post'
     login_url = '/login/'
     model = Post
     fields = ('message',)
