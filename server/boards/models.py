@@ -36,7 +36,7 @@ class Topic(models.Model):
 
     def get_page_count(self):
         count = self.posts.count()
-        pages = count / 2
+        pages = count / settings.PAGINATION_COUNT
         return math.ceil(pages)
 
     def has_many_pages(self, count=None):
