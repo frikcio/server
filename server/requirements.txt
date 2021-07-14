@@ -10,6 +10,7 @@ Django==3.2.4
 django-avatar==5.0.0
 django-widget-tweaks==1.4.8
 Faker~=8.9.0
+factory-boy==3.2.0
 kombu==5.1.0
 Markdown==3.3.4
 Pillow==8.2.0
