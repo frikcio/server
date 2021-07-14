@@ -23,12 +23,14 @@ User = get_user_model()
 
 @require_http_methods(["POST"])
 def change_mailing_status(request, user_pk):
-    # get new mailing status from request, and change user's periodic mailing 
-    new_mailing_status = request.META['QUERY_STRING'].split('=')[1]  # get new mailing status from query string
-    user_settings = get_object_or_404(Settings, user__pk=user_pk)  # get user's settings
-    user_settings.periodic_mailing = True if new_mailing_status == 'true' else False
-    user_settings.save()
-    return HttpResponse("Parameter changed", status=202)
+    # get new mailing status from request, and change user's periodic mailing
+    if request.META['QUERY_STRING']:
+        new_mailing_status = request.META['QUERY_STRING'].split('=')[1]  # get new mailing status from query string
+        user_settings = get_object_or_404(Settings, user__pk=user_pk)  # get user's settings
+        user_settings.periodic_mailing = False if new_mailing_status == 'false' else True
+        user_settings.save()
+        return HttpResponse('Parameter changed', status=202)
+    return HttpResponse('need query params', status=400)
 
 
 class RegisterView(CreateView):
@@ -39,7 +41,7 @@ class RegisterView(CreateView):
         # Save user and send_verification_email with celery help
         user = form.save(commit=False)
         user.is_active = False
-        group = Group.objects.get(pk=form.cleaned_data['groups'])
+        group = Group.objects.get(name=form.cleaned_data['groups'])
         with transaction.atomic():
             user.save()
             user.groups.add(group)
@@ -54,6 +56,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     fields = ('first_name', 'last_name', 'gender',)
     template_name = 'accounts/account.html'
     success_url = reverse_lazy('account')
+    login_url = '/login/'
 
     def get_object(self, queryset=None):
         return self.request.user
