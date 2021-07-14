@@ -4,14 +4,6 @@ from django.db import models
 from django.utils import timezone
 
 
-class GroupCreation(object):
-    NAMES = ['readers', 'writers']
-
-    def create(self):
-        # Create users groups for server
-        Group.objects.bulk_create([Group(name=name) for name in self.NAMES])  # Create all groups from GROUP_NAMES
-
-
 class User(AbstractUser):
     class Gender(models.IntegerChoices):
         NOT_SELECTED = 0
