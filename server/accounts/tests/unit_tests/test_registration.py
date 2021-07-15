@@ -1,6 +1,7 @@
 from django.contrib.auth.models import Group
 from faker import Factory
 
+from accounts.choices import GroupChoices
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -16,12 +17,12 @@ class RegistrationTest(TestCase):
     def setUp(self):
         username = fake.name().split(" ")[0]  # fake.name() return "Name Surname", so I split the string and get "Name"
         password = fake.password()
-        self.group = Group.objects.first()
+        self.group = Group.objects.get(name=GroupChoices.READERS)
         self.data = {'username': username,
                      'email': fake.email(),
                      'password1': password,
                      'password2': password,
-                     'groups': self.group.pk,
+                     'groups': self.group.name,
                      }
         self.url = reverse('register')
 
