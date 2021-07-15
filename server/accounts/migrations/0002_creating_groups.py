@@ -6,7 +6,7 @@ from accounts.choices import GroupChoices
 def create_groups(apps, schema_editor):
     # Create users groups on migrate this migrations 
     Group = apps.get_model('auth', 'Group')
-    Group.objects.bulk_create([Group(name=group_name) for group_name in GroupChoices.choices]) # create all groups from GROUP_NAMES
+    Group.objects.bulk_create([Group(name=group_name) for group_name in GroupChoices.values]) # create all groups from GROUP_NAMES
 
 
 def delete_groups(apps, schema_editor):
