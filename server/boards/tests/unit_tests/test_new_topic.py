@@ -1,25 +1,24 @@
 from faker import Factory
-import factory
 
 from django.contrib.auth.models import Group
-from django.shortcuts import get_object_or_404
 from django.test import TestCase
 from django.urls import reverse
 
-from accounts.factories import UserFactory, GroupPermissions
+from accounts.choices import GroupChoices
+from accounts.factories import UserFactory, add_writers_permissions_to
 from boards.factories import BoardFactory
 from boards.models import Topic, Post
 
 
 fake = Factory.create()
 
+
 class TestNewTopic(TestCase):
     def setUp(self):
         self.board = BoardFactory()
         user = UserFactory()
-        readers_group = get_object_or_404(Group, name='readers')
-        writers_group = get_object_or_404(Group, name='writers')
-        GroupPermissions.add_writers_permissions(writers_group)
+        writers_group = Group.objects.get(name=GroupChoices.WRITERS)
+        add_writers_permissions_to(writers_group)
         user.groups.add(writers_group)
         self.client.force_login(user=user)
         self.data = {'name': fake.word(), 'message': fake.text()}
