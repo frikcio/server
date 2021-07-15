@@ -4,5 +4,5 @@ from django.utils.translation import gettext_lazy as _
 
 
 class GroupChoices(models.TextChoices):
-    READERS = 'read', _('readers')
-    WRITERS = 'write', _('writers')
+    READERS = 'readers', _('readers')
+    WRITERS = 'writers', _('writers')
