@@ -1,13 +1,14 @@
 from faker import Factory
 
 from django.contrib.auth.models import Group
-from django.shortcuts import get_object_or_404
 from django.test import TestCase
 from django.urls import reverse
 
-from accounts.factories import UserFactory, GroupPermissions
+from accounts.choices import GroupChoices
+from accounts.factories import UserFactory, add_readers_permissions_to
 from boards.factories import BoardFactory, TopicFactory
 from boards.models import Board, Topic, Post
+
 
 fake = Factory.create()
 
@@ -16,10 +17,8 @@ class ReplyTopicTests(TestCase):
     def setUp(self):
         user = UserFactory()
         board = BoardFactory()
-        readers_group = get_object_or_404(Group, name='readers')
-        writers_group = get_object_or_404(Group, name='writers')
-        GroupPermissions.add_writers_permissions(writers_group)
-        GroupPermissions.add_readers_permissions(readers_group)
+        readers_group = Group.objects.get(name=GroupChoices.READERS)
+        add_readers_permissions_to(readers_group)
         user.groups.add(readers_group)
         self.topic = TopicFactory(board=board, owner=user)
         self.client.force_login(user=user)
