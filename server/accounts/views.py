@@ -1,5 +1,6 @@
 import base64
 
+from PIL import Image
 from django.contrib.auth import login, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,16 +13,16 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
-from django.views.generic import CreateView, UpdateView, DetailView
+from django.views.generic import CreateView, UpdateView, DetailView, FormView
 
-from .forms import RegisterForm, SettingsForm
-from .models import Settings
+from .forms import RegisterForm, SettingsForm, AvatarForm, UserUpdateForm
+from .models import Settings, Avatar
 from .tasks import send_verification_email
 
 User = get_user_model()
 
 
-@require_http_methods(["POST"])
+@require_http_methods(['POST'])
 def change_mailing_status(request, user_pk):
     # get new mailing status from request, and change user's periodic mailing
     if request.META['QUERY_STRING']:
@@ -46,27 +47,10 @@ class RegisterView(CreateView):
             user.save()
             user.groups.add(group)
             Settings.objects.create(user=user)
+            Avatar.objects.create(user=user)
         absolute_url = self.request.build_absolute_uri('/')
         send_verification_email.delay(user.pk, absolute_url)
         return redirect('home')
-
-
-class UserUpdateView(LoginRequiredMixin, UpdateView):
-    model = User
-    fields = ('first_name', 'last_name', 'gender',)
-    template_name = 'accounts/account.html'
-    success_url = reverse_lazy('account')
-    login_url = '/login/'
-
-    def get_object(self, queryset=None):
-        return self.request.user
-
-    def get_context_data(self, **kwargs):
-        # Append second form on template
-        context = super().get_context_data()
-        context['mailing_form'] = SettingsForm(self.request.POST or None,
-                                               instance=get_object_or_404(Settings, user__pk=self.request.user.pk))
-        return context
 
 
 ACCOUNT_VERIFICATION_TOKEN = "_verification_token"
@@ -122,3 +106,48 @@ class AccountActivateView(DetailView):
                 'form': None,
             })
         return context
+
+
+class UserUpdateView(LoginRequiredMixin, UpdateView):
+    form_class = UserUpdateForm
+    template_name = 'accounts/account.html'
+    success_url = reverse_lazy('account')
+    login_url = '/login/'
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        # Append second form on template
+        context = super().get_context_data()
+        context['mailing_form'] = SettingsForm(self.request.POST,
+                                               instance=get_object_or_404(Settings, user__pk=self.request.user.pk))
+        context['avatar_form'] = AvatarForm(self.request.POST,
+                                            instance=get_object_or_404(Avatar, user__pk=self.request.user.pk))
+        return context
+
+
+class UploadAvatarView(LoginRequiredMixin, UpdateView):
+    login_url = '/login/'
+    form_class = AvatarForm
+    http_method_names = ['post']
+    pk_url_kwarg = 'user_pk'
+
+    def form_valid(self, form):
+        avatar = form.save(commit=False)
+        x = form.cleaned_data.get('x')
+        y = form.cleaned_data.get('y')
+        w = form.cleaned_data.get('width')
+        h = form.cleaned_data.get('height')
+        image = Image.open(avatar.avatar)
+        cropped_image = image.crop((x, y, w + x, h + y))
+        resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
+        resized_image.save(avatar.avatar.path)
+        print(resized_image)
+        avatar.avatar = resized_image
+        avatar.user = self.request.user
+        avatar.save()
+        return HttpResponse('Created', status=201)
+
+    def get_queryset(self):
+        return Avatar.objects.filter(user_id=self.request.user)
