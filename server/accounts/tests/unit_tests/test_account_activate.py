@@ -27,13 +27,13 @@ class AccountActivateViewTests(TestCase):
         self.view.setup(request=request)
         self.view.kwargs.update(kwargs)
 
-    def test_get_user_success(self):
+    def test_success_get_user(self):
         # Get user if get correctly uid64 or token
         url_user = self.view.get_user()
         db_user = User.objects.first()
         self.assertEquals(url_user, db_user)
 
-    def test_get_user_fail(self):
+    def test_fail_get_user(self):
         # Get None if get wrong uid64 or token
         self.view.kwargs['uid64'] = 'MktR=='
         url_user = self.view.get_user()
