@@ -22,6 +22,11 @@ class User(AbstractUser):
         return int((timezone.now().date() - self.birth_date).year)
 
 
+class Avatar(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='avatar')
+    avatar = models.ImageField(blank=True, null=True, upload_to=f'accounts/{user}/')
+
+
 class Settings(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='settings')
     periodic_mailing = models.BooleanField(default=False)
