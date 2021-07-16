@@ -25,7 +25,7 @@
                     </button>
                     <div class="collapse navbar-collapse" id="main-menu" style="justify-content: flex-end">
                         {% if user.is_authenticated %}
-                            {{ user.avatar }}
+                            <canvas id="user-icon" width="40" height="40"></canvas>
                             <ul class="navbar-nav ml-auto">
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="user-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -58,8 +58,8 @@
             </div>
         {% endblock body %}
         <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
-        <script src="{% static 'js/jquery-cropper.js' %}"></script>
-        <script src="{% static 'js/cropper.js' %}"></script>
+        <script src="{% static 'js/jquery-cropper.min.js' %}"></script>
+        <script src="{% static 'js/cropper.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>
         <script src="{% static 'js/bootstrap.min.js' %}"></script>
         {% block javascript %}
