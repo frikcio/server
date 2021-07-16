@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.choices import GroupChoices
-from accounts.factories import UserFactory, add_readers_permissions_to
+from accounts.factories import UserFactory, add_readers_permissions_to_group
 from boards.factories import BoardFactory, TopicFactory
 from boards.models import Board, Topic, Post
 
@@ -18,7 +18,7 @@ class ReplyTopicTests(TestCase):
         user = UserFactory()
         board = BoardFactory()
         readers_group = Group.objects.get(name=GroupChoices.READERS)
-        add_readers_permissions_to(readers_group)
+        add_readers_permissions_to_group(readers_group)
         user.groups.add(readers_group)
         self.topic = TopicFactory(board=board, owner=user)
         self.client.force_login(user=user)
