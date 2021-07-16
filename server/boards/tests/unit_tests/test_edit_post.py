@@ -6,7 +6,7 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
 from accounts.choices import GroupChoices
-from accounts.factories import UserFactory, add_readers_permissions_to
+from accounts.factories import UserFactory, add_readers_permissions_to_group
 from boards.factories import BoardFactory, TopicFactory, PostFactory
 from boards.models import Post, Board, Topic
 from boards.views import PostUpdateView
@@ -21,7 +21,7 @@ class TestsPostUpdateView(TestCase):
     def setUp(self):
         self.user_1, self.user_2 = UserFactory.create_batch(2)
         readers_group = Group.objects.get(name=GroupChoices.READERS)
-        add_readers_permissions_to(readers_group)
+        add_readers_permissions_to_group(readers_group)
         self.user_1.groups.add(readers_group)
         self.user_2.groups.add(readers_group)
         board = BoardFactory()
@@ -40,7 +40,7 @@ class TestsPostUpdateView(TestCase):
         self.assertIn(self.post_1, queryset)
         self.assertNotIn(self.post_2, queryset)
 
-    def test_post_updated_by_owner(self):
+    def test_update_post_by_owner(self):
         # Update message, updated_at and updated_by if request sends by post's owner
         self.client.force_login(user=self.user_1)
         response = self.client.post(self.url, data={'message': fake.text()})
@@ -50,7 +50,7 @@ class TestsPostUpdateView(TestCase):
         self.assertNotEqual(not_updated_post.updated_at, updated_post.updated_at)
         self.assertNotEqual(not_updated_post.message, updated_post.message)
 
-    def test_post_updated_by_not_owner(self):
+    def test_update_post_by_not_owner(self):
         # Update nothing if request sends by not post's owner
         self.client.force_login(user=self.user_2)
         self.client.post(self.url, data={'message': fake.text()})
