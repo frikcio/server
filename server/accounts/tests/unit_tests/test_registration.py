@@ -38,7 +38,7 @@ class RegistrationTest(TestCase):
         user = User.objects.first()
         self.assertFalse(user.is_active)
 
-    def test_user_group(self):
+    def test_user_in_group(self):
         # Check that user is contains in group
         self.client.post(self.url, self.data)
         another_group = Group.objects.last()
