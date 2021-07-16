@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.choices import GroupChoices
-from accounts.factories import UserFactory, add_writers_permissions_to
+from accounts.factories import UserFactory, add_writers_permissions_to_group
 from boards.factories import BoardFactory
 from boards.models import Topic, Post
 
@@ -18,7 +18,7 @@ class TestNewTopic(TestCase):
         self.board = BoardFactory()
         user = UserFactory()
         writers_group = Group.objects.get(name=GroupChoices.WRITERS)
-        add_writers_permissions_to(writers_group)
+        add_writers_permissions_to_group(writers_group)
         user.groups.add(writers_group)
         self.client.force_login(user=user)
         self.data = {'name': fake.word(), 'message': fake.text()}
