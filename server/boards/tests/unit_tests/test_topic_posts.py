@@ -38,7 +38,7 @@ class TopicPostsTests(TestCase):
         response = self.client.get(self.url)
         self.assertIn("topic", response.context)
 
-    def test_increase_topic_view(self):
+    def test_increase_topic_views(self):
         # Check that topic's views are increase, when render template
         self.client.get(self.url)
         topic = Topic.objects.first()
