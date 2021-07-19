@@ -13,10 +13,10 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
-from django.views.generic import CreateView, UpdateView, DetailView, FormView
+from django.views.generic import CreateView, UpdateView, DetailView
 
 from .forms import RegisterForm, SettingsForm, AvatarForm, UserUpdateForm
-from .models import Settings, Avatar
+from .models import Settings
 from .tasks import send_verification_email
 
 User = get_user_model()
@@ -47,7 +47,6 @@ class RegisterView(CreateView):
             user.save()
             user.groups.add(group)
             Settings.objects.create(user=user)
-            Avatar.objects.create(user=user)
         absolute_url = self.request.build_absolute_uri('/')
         send_verification_email.delay(user.pk, absolute_url)
         return redirect('home')
@@ -120,10 +119,10 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         # Append second form on template
         context = super().get_context_data()
-        context['mailing_form'] = SettingsForm(self.request.POST,
+        context['mailing_form'] = SettingsForm(self.request.POST or None,
                                                instance=get_object_or_404(Settings, user__pk=self.request.user.pk))
-        context['avatar_form'] = AvatarForm(self.request.POST,
-                                            instance=get_object_or_404(Avatar, user__pk=self.request.user.pk))
+        context['avatar_form'] = AvatarForm(self.request.POST or None,
+                                            instance=get_object_or_404(User, pk=self.request.user.pk))
         return context
 
 
@@ -134,20 +133,9 @@ class UploadAvatarView(LoginRequiredMixin, UpdateView):
     pk_url_kwarg = 'user_pk'
 
     def form_valid(self, form):
-        avatar = form.save(commit=False)
-        x = form.cleaned_data.get('x')
-        y = form.cleaned_data.get('y')
-        w = form.cleaned_data.get('width')
-        h = form.cleaned_data.get('height')
-        image = Image.open(avatar.avatar)
-        cropped_image = image.crop((x, y, w + x, h + y))
-        resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
-        resized_image.save(avatar.avatar.path)
-        print(resized_image)
-        avatar.avatar = resized_image
-        avatar.user = self.request.user
-        avatar.save()
+        form.save()
         return HttpResponse('Created', status=201)
 
-    def get_queryset(self):
-        return Avatar.objects.filter(user_id=self.request.user)
+    def get_object(self, queryset=None):
+        return get_object_or_404(User, pk=self.request.user.pk)
+
