@@ -1,7 +1,6 @@
 {% load static %}
 <script>
     $(function () {
-
         /* SCRIPT TO OPEN THE MODAL WITH THE PREVIEW */
         $("#id_avatar").change(function () {
             if (this.files && this.files[0]) {
@@ -22,8 +21,8 @@
             $image.cropper({
                 viewMode: 1,
                 aspectRatio: 1 / 1,
-                minCropBoxWidth: 100,
-                minCropBoxHeight: 100,
+                minCropBoxWidth: 200,
+                minCropBoxHeight: 200,
                 ready: function () {
                     $image.cropper("setCanvasData", canvasData);
                     $image.cropper("setCropBoxData", cropBoxData);
@@ -45,13 +44,37 @@
 
         /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
         $(".js-crop-and-upload").click(function () {
-            var cropData = $image.cropper("getData");
-            $("#id_x").val(cropData["x"]);
-            $("#id_y").val(cropData["y"]);
-            $("#id_height").val(cropData["height"]);
-            $("#id_width").val(cropData["width"]);
-            $("#formUpload").submit();
+            cropData = $image.cropper("getData");
+            //Get file from form.
+            form_data = new FormData();
+            file = $('#id_avatar').get(0).files[0]
+            form_data.append('avatar', file);
+            form_data.append('x', cropData["x"]);
+            form_data.append('y', cropData["y"]);
+            form_data.append('height', cropData["height"]);
+            form_data.append('width', cropData["width"]);
+            $('#modalCrop').modal('hide');
+            //Send file with ajax.
+            $.ajax({
+                url: '{% url 'account_avatar' request.user.pk %}',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                type: 'POST',
+                credential: 'include',
+                dataType: 'json',
+                cache: false,
+                processData: false,
+                contentType: false,
+                data: form_data,
+                complete: function (data) {
+                    if (data.success == true) { // if true (1)
+                        setTimeout(function () {// wait for 5 secs(2)
+                            location.reload(); // then reload the page.(3)
+                        }, 5000);
+                    }
+                }
+            });
         });
-
     });
 </script>
