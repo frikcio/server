@@ -21,8 +21,8 @@
             $image.cropper({
                 viewMode: 1,
                 aspectRatio: 1 / 1,
-                minCropBoxWidth: 200,
-                minCropBoxHeight: 200,
+                minCropBoxWidth: {{big_size}},
+                minCropBoxHeight: {{big_size}},
                 ready: function () {
                     $image.cropper("setCanvasData", canvasData);
                     $image.cropper("setCropBoxData", cropBoxData);
@@ -53,7 +53,6 @@
             form_data.append('y', cropData["y"]);
             form_data.append('height', cropData["height"]);
             form_data.append('width', cropData["width"]);
-            $('#modalCrop').modal('hide');
             //Send file with ajax.
             $.ajax({
                 url: '{% url 'account_avatar' request.user.pk %}',
@@ -68,11 +67,9 @@
                 contentType: false,
                 data: form_data,
                 complete: function (data) {
-                    if (data.success == true) { // if true (1)
-                        setTimeout(function () {// wait for 5 secs(2)
-                            location.reload(); // then reload the page.(3)
-                        }, 5000);
-                    }
+                    $(document).ajaxStop(function () {
+                        document.location.reload()
+                    })
                 }
             });
         });
