@@ -1,6 +1,5 @@
 import base64
 
-from PIL import Image
 from django.contrib.auth import login, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -15,7 +14,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, UpdateView, DetailView
 
-from .forms import RegisterForm, SettingsForm, AvatarForm, UserUpdateForm
+from .forms import RegisterForm, SettingsForm, AvatarForm
 from .models import Settings
 from .tasks import send_verification_email
 
@@ -108,7 +107,8 @@ class AccountActivateView(DetailView):
 
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
-    form_class = UserUpdateForm
+    model = User
+    fields = ('first_name', 'last_name', 'gender',)
     template_name = 'accounts/account.html'
     success_url = reverse_lazy('account')
     login_url = '/login/'
@@ -121,8 +121,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data()
         context['mailing_form'] = SettingsForm(self.request.POST or None,
                                                instance=get_object_or_404(Settings, user__pk=self.request.user.pk))
-        context['avatar_form'] = AvatarForm(self.request.POST or None,
-                                            instance=get_object_or_404(User, pk=self.request.user.pk))
+        context['avatar_form'] = AvatarForm()
         return context
 
 
