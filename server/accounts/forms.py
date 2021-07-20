@@ -22,15 +22,6 @@ class SettingsForm(forms.ModelForm):
         fields = ['periodic_mailing']
 
 
-class UserUpdateForm(forms.ModelForm):
-    first_name = forms.CharField(required=True)
-    last_name = forms.CharField(required=True)
-
-    class Meta:
-        model = get_user_model()
-        fields = ['first_name', 'last_name', 'gender']
-
-
 class AvatarForm(forms.ModelForm):
     x = forms.FloatField(widget=forms.HiddenInput())
     y = forms.FloatField(widget=forms.HiddenInput())
@@ -43,7 +34,6 @@ class AvatarForm(forms.ModelForm):
 
     def save(self):
         form = super(AvatarForm, self).save()
-        avatar = self.cleaned_data.get('avatar')
         x = self.cleaned_data.get('x')
         y = self.cleaned_data.get('y')
         w = self.cleaned_data.get('width')
