@@ -12,7 +12,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
-from django.views.generic import CreateView, UpdateView, DetailView
+from django.views.generic import CreateView, UpdateView, DetailView, DeleteView
 
 from .forms import RegisterForm, SettingsForm, AvatarForm
 from .models import Settings
@@ -132,9 +132,24 @@ class UploadAvatarView(LoginRequiredMixin, UpdateView):
     pk_url_kwarg = 'user_pk'
 
     def form_valid(self, form):
+        if self.request.user.avatar:
+            self.request.user.avatar.delete()
         form.save()
         return HttpResponse('Created', status=201)
 
     def get_object(self, queryset=None):
         return get_object_or_404(User, pk=self.request.user.pk)
 
+
+class DeleteAvatarView(LoginRequiredMixin, DeleteView):
+    login_url = '/login/'
+    http_method_names = ['delete']
+    pk_url_kwarg = 'user_pk'
+
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object(queryset=User.objects.filter(pk=self.request.user.pk))
+        if user.avatar:
+            user.avatar.delete()
+            return HttpResponse('Deleted', status=200)
+        else:
+            return HttpResponse('Not Found', status=204)
