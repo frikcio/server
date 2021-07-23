@@ -4,9 +4,16 @@
         $('#delete_avatar').on('click', function () {
             $.ajax({
                 url: '{% url 'delete_avatar' request.user.pk %}',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
                 type: 'DELETE',
                 credential: 'include',
-                data: {'csrfmiddlewaretoken': '{{ csrf_token }}'}
+                complete: function (data) {
+                    $(document).ajaxStop(function () {
+                        document.location.reload()
+                    })
+                }
             })
         })
     {% endif %}
