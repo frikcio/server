@@ -11,6 +11,7 @@ urlpatterns = [
     path('account/', UserUpdateView.as_view(), name='account'),
     path('account/<int:user_pk>/settings/', change_mailing_status, name='account_settings'),
     path('account/<int:user_pk>/avatar/', UploadAvatarView.as_view(), name='account_avatar'),
+    path('account/<int:user_pk>/avatar/delete/', DeleteAvatarView.as_view(), name='delete_avatar'),
     path('password/reset/', PasswordResetView.as_view(template_name='accounts/password_reset.html'),
          name='password_reset'),
     path('reset/done/', PasswordResetDoneView.as_view(template_name='accounts/password_reset_done.html'),
