@@ -32,7 +32,7 @@ class AvatarForm(forms.ModelForm):
         model = get_user_model()
         fields = ('avatar', 'x', 'y', 'width', 'height',)
 
-    def save(self):
+    def save(self, **kwargs):
         form = super(AvatarForm, self).save()
         x = self.cleaned_data.get('x')
         y = self.cleaned_data.get('y')
