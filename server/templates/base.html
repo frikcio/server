@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="stylesheet" href="{% static 'css/cropper.css' %}">
-    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
     {% block stylesheet %}
     {% endblock %}
 </head>
@@ -29,9 +28,6 @@
                 {% if user.is_authenticated %}
                     {% if request.user.avatar %}
                         <img height="{{ small_size }}" src="{{ request.user.avatar.url }}">
-                    {% elif request.user.first_name and request.user.last_name %}
-                        <canvas id="{{ request.user.username }}" width="{{ small_size }}"
-                                height="{{ small_size }}"></canvas>
                     {% else %}
                         <img height="{{ small_size }}" src="{% static 'images/avatar.png' %}">
                     {% endif %}
@@ -67,7 +63,7 @@
         {% endblock %}
     </div>
 {% endblock body %}
-
+<script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
 <script src="{% static 'js/jquery-cropper.min.js' %}"></script>
 <script src="{% static 'js/cropper.min.js' %}"></script>
 <script src="{% static 'js/popper.min.js' %}"></script>
