@@ -9,14 +9,22 @@
 {% endblock %}
 
 {% block content %}
-    <div style="display: flex; justify-content: center" class="row">
-        <div style="align-self: flex-end">
+    <div style="display: flex; justify-content: space-between; flex-direction: row; flex-wrap: nowrap" class="row">
+        <div style="max-width: 300px">
             {% if request.user.avatar %}
-                <img height="{{ big_size }}" src="{{ request.user.avatar.url }}">
-            {% elif request.user.first_name and request.user.last_name %}
-                <canvas id="{{ request.user.username }}" width="{{ big_size }}" height="{{ big_size }}"></canvas>
+                <div class="parent" style="display: inline-block; position: relative">
+                    <img height="{{ big_size }}" src="{{ request.user.avatar.url }}" alt="user avatar">
+                    <button id="delete_avatar" style="
+                                position: absolute;
+                                top: 0;
+                                right: 0;
+                                color: black;
+                                background-color: #dee2e6;
+                                border-radius: 5px">X
+                    </button>
+                </div>
             {% else %}
-                <img height="{{ big_size }}" src="{% static 'images/avatar.png' %}">
+                <img height="{{ big_size }}" src="{% static 'images/avatar.png' %}" alt="No avatar">
             {% endif %}
             <!-- FORM TO UPLOAD THE IMAGES -->
             <form method="post" enctype="multipart/form-data" id="formUpload">
@@ -26,7 +34,6 @@
         </div>
         <div style="width: 300px" class="col-lg-6 col-md-8 col-sm-10">
             <!-- MODAL TO CROP THE IMAGE -->
-            <p align="center" >You are in <b>{{ request.user.groups.first }}</b> group</p>
             <div class="modal fade" id="modalCrop">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -58,8 +65,14 @@
             <form method="post" novalidate>
                 {% csrf_token %}
                 {% include 'includes/form.html' %}
-                <p align="center"><button style="margin-top: 20px" id="submit" type="submit" class="btn btn-success">Save changes</button></p>
+                <p align="center">
+                    <button style="margin-top: 20px" id="submit" type="submit" class="btn btn-success">Save changes
+                    </button>
+                </p>
             </form>
+        </div>
+        <div style="max-width: 300px; background-color: #dee2e6; border-radius: 5px; padding-top: 10px">
+            <p align="center">You are in <b>{{ request.user.groups.first }}</b> group</p>
             <h3>Additional Settings:</h3>
             <form method="post">
                 {% csrf_token %}
@@ -72,5 +85,5 @@
 {% block javascript %}
     {% include 'includes/change_mailing_status.html' %}
     {% include 'includes/upload_avatar.html' %}
-    {% include 'includes/avatar_generation.html' %}
+    {% include 'includes/delete_avatar.html' %}
 {% endblock %}
