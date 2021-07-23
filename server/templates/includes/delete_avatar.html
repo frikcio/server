@@ -1,0 +1,13 @@
+{% load static %}
+<script>
+    {% if request.user.avatar %}
+        $('#delete_avatar').on('click', function () {
+            $.ajax({
+                url: '{% url 'delete_avatar' request.user.pk %}',
+                type: 'DELETE',
+                credential: 'include',
+                data: {'csrfmiddlewaretoken': '{{ csrf_token }}'}
+            })
+        })
+    {% endif %}
+</script>
