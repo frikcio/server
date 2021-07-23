@@ -28,9 +28,6 @@
                     <div class="col-2">
                         {% if post.created_by.avatar %}
                             <img height="{{ medium_size }}" src="{{ post.created_by.avatar.url }}">
-                        {% elif post.created_by.first_name and post.created_by.last_name %}
-                            <canvas id="{{ post.created_by.username }}" width="{{ medium_size }}"
-                                    height="{{ medium_size }}"></canvas>
                         {% else %}
                             <img height="{{ medium_size }}" src="{% static 'images/avatar.png' %}">
                         {% endif %}
