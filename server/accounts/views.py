@@ -46,8 +46,7 @@ class RegisterView(CreateView):
             user.save()
             user.groups.add(group)
             Settings.objects.create(user=user)
-        absolute_url = self.request.build_absolute_uri('/')
-        send_verification_email.delay(user.pk, absolute_url)
+        send_verification_email.delay(user.pk, self.request.META['HTTP_ORIGIN'])
         return redirect('home')
 
 
