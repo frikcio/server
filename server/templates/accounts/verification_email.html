@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+Hi {{ user }}
+Thanks for register in our site!)))
+To continue registration and activate your account, please follow:
+{{ http_host }}{% url 'activate_user' uid64=uid64 token=token %}
