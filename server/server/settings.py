@@ -139,6 +139,7 @@ LOGOUT_REDIRECT_URL = 'home'
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_SENDER = 'DjangoBoards Develop Team'
 
 CELERY_BROKER_URL = f'redis://{os.environ.get("REDIS_HOST")}:6379'
 CELERY_RESULT_BACKEND = f'redis://{os.environ.get("REDIS_HOST")}:6379'
