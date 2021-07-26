@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+Hello {{ user.username }}
+you get this email because you accept periodic mailing.
+If you wanna to cancel periodic mailing, please follow:
+{{ http_host }}{% url 'account_settings' user.pk  %}
